@@ -567,6 +567,15 @@ body { padding-top: var(--header-h); }
 .rules-list { display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
 .rules-list li::before { content: "⚠ "; color: var(--c-yellow); }
 
+/* ---------- Comentarios ---------- */
+.comments-list { display: flex; flex-direction: column; gap: 12px; margin: 14px 0 22px; }
+.comment-item { background: var(--c-carbon); border: var(--border-hairline); border-radius: var(--radius); padding: 14px 16px; }
+.comment-item__meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 10px; }
+.comment-item__nombre { font-family: var(--ff-mono); font-size: 12px; letter-spacing: 0.08em; color: var(--c-green-bright); text-transform: uppercase; }
+.comment-item__fecha { font-family: var(--ff-mono); font-size: 11px; color: var(--c-grey-dim); white-space: nowrap; }
+.comment-item p { font-size: 13.5px; color: var(--c-off-white); }
+.comment-form { border-top: var(--border-hairline); padding-top: 20px; }
+
 /* ---------- Normas ---------- */
 .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
 .rule-card { background: var(--c-carbon); border: var(--border-hairline); border-radius: var(--radius); padding: 24px; }

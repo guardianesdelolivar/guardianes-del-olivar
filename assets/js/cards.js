@@ -4,10 +4,10 @@
  */
 
 const ESTADO_TEXTO = {
-  abiertas: "🟢 INSCRIPCIONES ABIERTAS",
-  ultimas: "🟡 ÚLTIMAS PLAZAS",
-  completo: "🔴 COMPLETO",
-  finalizado: "⚫ FINALIZADO",
+  abiertas: "INSCRIPCIONES ABIERTAS",
+  ultimas: "ÚLTIMAS PLAZAS",
+  completo: "COMPLETO",
+  finalizado: "FINALIZADO",
 };
 
 const ESTADO_BADGE_CLASS = {

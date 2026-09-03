@@ -11,7 +11,7 @@
  * desplegado como aplicación web. Mientras diga "TU_URL_DE_APPS_SCRIPT",
  * la web sigue funcionando normal, solo que con el número fijo de siempre.
  */
-const CONTADOR_URL = "TU_URL_DE_APPS_SCRIPT";
+const CONTADOR_URL = "https://script.google.com/macros/s/AKfycbwAbu-1H-ZfxcTDApGND_qR9ucSbZqvHyiblrKXtxQONWxx5PZD747FRK0laOOa1rER/exec";
 
 function contadorConfigurado() {
   return CONTADOR_URL && CONTADOR_URL !== "TU_URL_DE_APPS_SCRIPT";
@@ -48,3 +48,34 @@ function incrementarPlazasEnVivo() {
       return null;
     });
 }
+
+/**
+ * COMENTARIOS — usan el mismo Apps Script que el contador de plazas
+ * (misma hoja de cálculo, pestaña "Comentarios" aparte). Requiere que
+ * el script de Apps Script tenga las acciones comentarios_listar y
+ * comentarios_nuevo añadidas.
+ */
+function listarComentarios(opId) {
+  if (!contadorConfigurado()) return Promise.resolve([]);
+  return fetch(`${CONTADOR_URL}?action=comentarios_listar&op=${encodeURIComponent(opId)}`)
+    .then((r) => r.json())
+    .then((data) => (Array.isArray(data.comentarios) ? data.comentarios : []))
+    .catch((err) => {
+      console.error("No se pudieron cargar los comentarios:", err);
+      return [];
+    });
+}
+
+function enviarComentario(opId, nombre, texto) {
+  if (!contadorConfigurado()) return Promise.resolve(null);
+  const params = new URLSearchParams({ action: "comentarios_nuevo", op: opId, nombre, texto });
+  return fetch(`${CONTADOR_URL}?${params.toString()}`)
+    .then((r) => r.json())
+    .then((data) => (data && data.ok ? data.comentario : null))
+    .catch((err) => {
+      console.error("No se pudo enviar el comentario:", err);
+      return null;
+    });
+}
+window.listarComentarios = listarComentarios;
+window.enviarComentario = enviarComentario;

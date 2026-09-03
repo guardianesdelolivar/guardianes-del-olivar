@@ -108,6 +108,60 @@
       ctaBtn.style.pointerEvents = "none";
       ctaBtn.style.opacity = "0.5";
     }
+
+    // Comentarios
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+    function formatearFecha(iso) {
+      try {
+        return new Date(iso).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+      } catch (err) {
+        return "";
+      }
+    }
+    const comentariosLista = document.querySelector("[data-comentarios-lista]");
+    const comentarioForm = document.querySelector("[data-comentario-form]");
+
+    function renderComentarios(lista) {
+      if (!comentariosLista) return;
+      if (!lista.length) {
+        comentariosLista.innerHTML = `<p class="empty-state">Todavía no hay comentarios. ¡Sé el primero!</p>`;
+        return;
+      }
+      comentariosLista.innerHTML = lista.map((c) => `
+        <div class="comment-item">
+          <div class="comment-item__meta">
+            <span class="comment-item__nombre">${escapeHTML(c.nombre)}</span>
+            <span class="comment-item__fecha">${formatearFecha(c.fecha)}</span>
+          </div>
+          <p>${escapeHTML(c.texto)}</p>
+        </div>`).join("");
+    }
+
+    if (comentariosLista && window.listarComentarios) {
+      window.listarComentarios(op.id).then(renderComentarios);
+    }
+
+    if (comentarioForm && window.enviarComentario) {
+      comentarioForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const nombre = comentarioForm.nombre.value.trim();
+        const texto = comentarioForm.texto.value.trim();
+        if (!nombre || !texto) return;
+        const btn = comentarioForm.querySelector("button");
+        btn.disabled = true;
+        btn.textContent = "PUBLICANDO…";
+        window.enviarComentario(op.id, nombre, texto).then((nuevo) => {
+          btn.disabled = false;
+          btn.textContent = "PUBLICAR COMENTARIO";
+          comentarioForm.reset();
+          if (nuevo && comentariosLista) {
+            window.listarComentarios(op.id).then(renderComentarios);
+          }
+        });
+      });
+    }
     });
   });
 })();

@@ -53,7 +53,8 @@ const EMAILJS_CONFIG = {
           fecha: operacion.fechaDisplay,
           horario: operacion.horario,
           ubicacion: `${operacion.ubicacion}, ${operacion.localidad}`,
-          precio: `${operacion.precio} €`,
+          precio: `${payload.precioFinal} €`,
+          almuerzo: payload.quiereAlmuerzo ? payload.almuerzo : "No almuerza",
         }
       );
       return Promise.resolve({ enviado: false, motivo: "EmailJS no configurado" });
@@ -66,7 +67,8 @@ const EMAILJS_CONFIG = {
         fecha: operacion.fechaDisplay,
         horario: operacion.horario,
         ubicacion: `${operacion.ubicacion}, ${operacion.localidad}`,
-        precio: `${operacion.precio} €`,
+        precio: `${payload.precioFinal} €`,
+        almuerzo: payload.quiereAlmuerzo ? payload.almuerzo : "No almuerza",
         callsign: payload.callsign,
       })
       .then(() => ({ enviado: true }))
@@ -100,6 +102,8 @@ const EMAILJS_CONFIG = {
         experiencia: payload.experiencia,
         observaciones: payload.observaciones || "—",
         consentimiento_fotos: payload.aceptaFotos ? "Sí" : "No",
+        almuerzo: payload.quiereAlmuerzo ? payload.almuerzo : "No almuerza",
+        precio_total: `${payload.precioFinal} €`,
       })
       .then(() => ({ enviado: true }))
       .catch((err) => {
@@ -220,6 +224,36 @@ const EMAILJS_CONFIG = {
       field.addEventListener("blur", () => validateField(field));
     });
 
+    // Almuerzo opcional (+10 €)
+    const almuerzoToggle = form.querySelector("[data-almuerzo-toggle]");
+    const almuerzoDetalle = form.querySelector("[data-almuerzo-detalle]");
+    const almuerzoSelect = form.querySelector("#almuerzo");
+    const almuerzoOtroWrap = form.querySelector("[data-almuerzo-otro-wrap]");
+    const almuerzoOtroInput = form.querySelector("#almuerzo_otro");
+    const precioTotalEl = document.querySelector("[data-precio-total]");
+
+    function actualizarPrecioTotal() {
+      const base = op.precio;
+      const total = almuerzoToggle && almuerzoToggle.checked ? base + 10 : base;
+      if (precioTotalEl) precioTotalEl.textContent = `${total} €`;
+    }
+
+    if (almuerzoToggle) {
+      almuerzoToggle.addEventListener("change", () => {
+        if (almuerzoDetalle) almuerzoDetalle.style.display = almuerzoToggle.checked ? "block" : "none";
+        if (!almuerzoToggle.checked && almuerzoOtroInput) clearFieldError(almuerzoOtroInput);
+        actualizarPrecioTotal();
+      });
+    }
+    if (almuerzoSelect) {
+      almuerzoSelect.addEventListener("change", () => {
+        const esOtro = almuerzoSelect.value === "otro";
+        if (almuerzoOtroWrap) almuerzoOtroWrap.style.display = esOtro ? "block" : "none";
+        if (!esOtro && almuerzoOtroInput) clearFieldError(almuerzoOtroInput);
+      });
+    }
+    actualizarPrecioTotal();
+
     function procesarInscripcion(payload) {
       // Punto de integración futuro: Stripe Checkout Session / PayPal Orders API.
       // De momento solo generamos un identificador visual de confirmación.
@@ -247,6 +281,15 @@ const EMAILJS_CONFIG = {
         }
       });
 
+      if (almuerzoToggle && almuerzoToggle.checked && almuerzoSelect && almuerzoSelect.value === "otro") {
+        if (!almuerzoOtroInput.value.trim()) {
+          valid = false;
+          setFieldError(almuerzoOtroInput, "Indica qué te gustaría almorzar.");
+        } else {
+          clearFieldError(almuerzoOtroInput);
+        }
+      }
+
       if (!valid) {
         const firstError = form.querySelector(".has-error input, .has-error select, .field-check[style*='red']");
         if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -254,6 +297,13 @@ const EMAILJS_CONFIG = {
       }
 
       const data = new FormData(form);
+      const quiereAlmuerzo = data.get("quiere_almuerzo") === "on";
+      let almuerzoElegido = null;
+      if (quiereAlmuerzo) {
+        const valorSelect = data.get("almuerzo");
+        almuerzoElegido = valorSelect === "otro" ? data.get("almuerzo_otro").trim() : valorSelect;
+      }
+      const precioFinal = op.precio + (quiereAlmuerzo ? 10 : 0);
       const payload = {
         operacionId: op.id,
         nombre: data.get("nombre"),
@@ -266,6 +316,9 @@ const EMAILJS_CONFIG = {
         experiencia: data.get("experiencia"),
         observaciones: data.get("observaciones") || null,
         aceptaFotos: data.get("acepta_fotos") === "on",
+        quiereAlmuerzo: quiereAlmuerzo,
+        almuerzo: almuerzoElegido,
+        precioFinal: precioFinal,
       };
 
       const resultado = procesarInscripcion(payload);

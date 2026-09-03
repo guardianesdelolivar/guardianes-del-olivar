@@ -90,6 +90,21 @@
               <h3>Reglas especiales</h3>
               <ul class="rules-list" data-op-reglas></ul>
             </div>
+            <div class="dossier-block">
+              <h3>Comentarios</h3>
+              <div class="comments-list" data-comentarios-lista><p class="empty-state">Cargando comentarios…</p></div>
+              <form class="comment-form" data-comentario-form>
+                <div class="field">
+                  <label for="com-nombre">Tu nombre</label>
+                  <input type="text" id="com-nombre" name="nombre" required maxlength="40" />
+                </div>
+                <div class="field" style="margin-top:12px;">
+                  <label for="com-texto">Comentario</label>
+                  <textarea id="com-texto" name="texto" rows="3" required maxlength="500"></textarea>
+                </div>
+                <button type="submit" class="btn btn-outline" style="margin-top:12px;">PUBLICAR COMENTARIO</button>
+              </form>
+            </div>
           </div>
 
           <aside>

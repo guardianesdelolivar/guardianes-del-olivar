@@ -121,6 +121,32 @@
               <textarea id="observaciones" name="observaciones" rows="4"></textarea>
             </div>
 
+            <div class="field-check-block" style="margin-top:18px;background:var(--c-black-soft);border:var(--border-hairline);border-radius:var(--radius);padding:16px 18px;">
+              <label class="field-check">
+                <input type="checkbox" name="quiere_almuerzo" data-almuerzo-toggle />
+                Quiero almorzar durante la partida (+10 €)
+              </label>
+              <div data-almuerzo-detalle style="display:none;margin-top:14px;">
+                <div class="field">
+                  <label for="almuerzo">Elige tu almuerzo</label>
+                  <select id="almuerzo" name="almuerzo">
+                    <option value="Huevos fritos con longaniza">Huevos fritos con longaniza</option>
+                    <option value="Huevos fritos con panceta">Huevos fritos con panceta</option>
+                    <option value="Huevos fritos con chorizo">Huevos fritos con chorizo</option>
+                    <option value="Huevos fritos con jamón">Huevos fritos con jamón</option>
+                    <option value="Huevos fritos con calamares">Huevos fritos con calamares</option>
+                    <option value="Bocadillo">Bocadillo</option>
+                    <option value="otro">Otro (especifica)</option>
+                  </select>
+                </div>
+                <div class="field" data-almuerzo-otro-wrap style="display:none;margin-top:12px;">
+                  <label for="almuerzo_otro">¿Qué te gustaría almorzar?</label>
+                  <input type="text" id="almuerzo_otro" name="almuerzo_otro" placeholder="Escribe tu opción" />
+                  <span class="field__error">Indica qué te gustaría almorzar.</span>
+                </div>
+              </div>
+            </div>
+
             <div class="form-footer">
               <label class="field-check">
                 <input type="checkbox" name="acepta_normas" required />
@@ -134,7 +160,7 @@
                 <input type="checkbox" name="acepta_fotos" required />
                 Doy mi consentimiento para que se hagan fotos y vídeos durante la operación y puedan publicarse en Instagram, WhatsApp o la galería de la web.
               </label>
-              <p class="form-note">El pago (10 €) se hace en efectivo, en el propio campo, una vez rellenes la documentación el día de la partida. Esta inscripción no supone ningún cargo ahora mismo.</p>
+              <p class="form-note">El pago (<strong data-precio-total>10 €</strong>) se hace en efectivo, en el propio campo, una vez rellenes la documentación el día de la partida. Esta inscripción no supone ningún cargo ahora mismo.</p>
               <button type="submit" class="btn btn-primary btn-lg btn-block">CONFIRMAR INSCRIPCIÓN</button>
             </div>
           </form>
