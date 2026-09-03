@@ -1,0 +1,291 @@
+/**
+ * INSCRIPCION.JS — resumen de la operación seleccionada, validación
+ * de formulario en cliente y pantalla de confirmación visual.
+ *
+ * ARQUITECTURA DE PAGOS: este formulario NO procesa pagos reales.
+ * Al confirmar, se genera un objeto `inscripcionPayload` con todos los
+ * datos necesarios para conectarlo más adelante a una pasarela real
+ * (Stripe Checkout / PayPal Orders API). Sustituir la función
+ * `procesarInscripcion()` por la llamada a la pasarela elegida.
+ *
+ * ENVÍO AUTOMÁTICO DEL BRIEFING POR EMAIL:
+ * Al inscribirse, se intenta enviar automáticamente un email de
+ * confirmación con la fecha, el horario y la ubicación de la operación
+ * (los mismos datos que hay en assets/js/data/operaciones.js: si los
+ * actualizáis ahí, el email sale ya actualizado, sin tocar nada más).
+ *
+ * Para que el envío sea REAL hace falta una cuenta gratuita en
+ * https://www.emailjs.com (no requiere servidor propio). Una vez
+ * creada, rellenad estos 3 valores con los que os da EmailJS:
+ */
+const EMAILJS_CONFIG = {
+  serviceId: "service_wefeffr",
+  templateId: "template_v839cbb", // Plantilla que recibe EL INSCRITO (confirmación + briefing)
+  templateIdOrganizador: "template_p2ckpzs", // Plantilla que RECIBES TÚ con los datos del inscrito
+  publicKey: "V_tz7LdkKL-4X5Iiq",
+};
+
+(function () {
+  "use strict";
+
+  let emailjsListo =
+    typeof window.emailjs !== "undefined" &&
+    EMAILJS_CONFIG.publicKey &&
+    EMAILJS_CONFIG.publicKey !== "TU_PUBLIC_KEY";
+
+  if (emailjsListo) {
+    try {
+      window.emailjs.init({ publicKey: EMAILJS_CONFIG.publicKey });
+    } catch (err) {
+      console.error("No se pudo inicializar EmailJS (el formulario seguirá funcionando igualmente):", err);
+      emailjsListo = false;
+    }
+  }
+
+  function enviarBriefingPorEmail(payload, operacion) {
+    if (!emailjsListo) {
+      console.info(
+        "[EmailJS no configurado] El briefing se habría enviado con estos datos:",
+        {
+          to_email: payload.email,
+          to_name: payload.nombre,
+          operacion_nombre: operacion.nombre,
+          fecha: operacion.fechaDisplay,
+          horario: operacion.horario,
+          ubicacion: `${operacion.ubicacion}, ${operacion.localidad}`,
+          precio: `${operacion.precio} €`,
+        }
+      );
+      return Promise.resolve({ enviado: false, motivo: "EmailJS no configurado" });
+    }
+    return window.emailjs
+      .send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
+        to_email: payload.email,
+        to_name: payload.nombre,
+        operacion_nombre: operacion.nombre,
+        fecha: operacion.fechaDisplay,
+        horario: operacion.horario,
+        ubicacion: `${operacion.ubicacion}, ${operacion.localidad}`,
+        precio: `${operacion.precio} €`,
+        callsign: payload.callsign,
+      })
+      .then(() => ({ enviado: true }))
+      .catch((err) => {
+        console.error("No se pudo enviar el email de briefing:", err);
+        return { enviado: false, motivo: "Error al enviar" };
+      });
+  }
+
+  function enviarNotificacionOrganizador(payload, operacion, referencia) {
+    const organizadorListo =
+      emailjsListo &&
+      EMAILJS_CONFIG.templateIdOrganizador &&
+      EMAILJS_CONFIG.templateIdOrganizador !== "TU_TEMPLATE_ID_ORGANIZADOR";
+
+    if (!organizadorListo) {
+      console.info("[Notificación al organizador no configurada] Datos del inscrito:", payload);
+      return Promise.resolve({ enviado: false });
+    }
+    return window.emailjs
+      .send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateIdOrganizador, {
+        referencia: referencia,
+        operacion_nombre: operacion.nombre,
+        nombre: payload.nombre,
+        apellidos: payload.apellidos,
+        dni: payload.dni,
+        telefono: payload.telefono,
+        email: payload.email,
+        callsign: payload.callsign,
+        equipo: payload.equipo || "—",
+        experiencia: payload.experiencia,
+        observaciones: payload.observaciones || "—",
+        consentimiento_fotos: payload.aceptaFotos ? "Sí" : "No",
+      })
+      .then(() => ({ enviado: true }))
+      .catch((err) => {
+        console.error("No se pudo enviar la notificación al organizador:", err);
+        return { enviado: false };
+      });
+  }
+
+  function getParam(name) {
+    return new URLSearchParams(location.search).get(name);
+  }
+
+  const VALIDADORES = {
+    nombre: (v) => v.trim().length >= 2,
+    apellidos: (v) => v.trim().length >= 2,
+    dni: (v) => /^(\d{8}[A-Za-z]|[XYZxyz]\d{7}[A-Za-z])$/.test(v.trim()),
+    telefono: (v) => /^(\+34\s?)?[6789]\d{2}\s?\d{3}\s?\d{3}$/.test(v.trim()),
+    email: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()),
+    callsign: (v) => v.trim().length >= 2,
+    experiencia: (v) => v.trim().length > 0,
+  };
+
+  const MENSAJES_ERROR = {
+    nombre: "Introduce tu nombre.",
+    apellidos: "Introduce tus apellidos.",
+    dni: "Formato de DNI/NIE no válido (ej. 12345678A).",
+    telefono: "Introduce un teléfono válido (9 dígitos).",
+    email: "Introduce un email válido.",
+    callsign: "Introduce tu nombre de operador / callsign.",
+    experiencia: "Selecciona tu nivel de experiencia.",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    (window.PLAZAS_LISTO || Promise.resolve()).finally(() => {
+    const id = getParam("op");
+    const op = id ? obtenerOperacionPorId(id) : null;
+    const summary = document.querySelector("[data-inscripcion-summary]");
+    const form = document.querySelector("[data-inscripcion-form]");
+    const notFound = document.querySelector("[data-inscripcion-not-found]");
+    const opSelect = document.querySelector("[data-op-select]");
+    const successPanel = document.querySelector("[data-form-success]");
+    const hiddenOpId = document.querySelector("[data-hidden-op-id]");
+
+    // Selector de operación (por si el usuario llega sin operación preseleccionada
+    // o quiere cambiarla).
+    if (opSelect) {
+      const inscribibles = ordenarOperacionesPorFecha(
+        OPERACIONES.filter((o) => o.status === "abiertas" || o.status === "ultimas")
+      );
+      opSelect.innerHTML = inscribibles
+        .map((o) => `<option value="${o.id}">${o.nombre} — ${o.fechaDisplay}</option>`)
+        .join("");
+      if (op) opSelect.value = op.id;
+      opSelect.addEventListener("change", () => {
+        const url = new URL(location.href);
+        url.searchParams.set("op", opSelect.value);
+        location.href = url.toString();
+      });
+    }
+
+    function renderSummary(operacion) {
+      if (!operacion) return;
+      summary.innerHTML = `
+        <span class="badge ${ESTADO_BADGE_CLASS[operacion.status]}" style="position:static;display:inline-flex;margin-bottom:14px;"><span class="dot"></span>${ESTADO_TEXTO[operacion.status]}</span>
+        <h3 style="margin-bottom:10px;">${operacion.nombre}</h3>
+        <dl style="display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font-size:13.5px;margin-bottom:16px;">
+          <dt class="divider-coords">FECHA</dt><dd>${operacion.fechaDisplay}</dd>
+          <dt class="divider-coords">LUGAR</dt><dd>${operacion.ubicacion}, ${operacion.localidad}${operacion.mapaUbicacion ? ` <a href="${operacion.mapaUbicacion}" target="_blank" rel="noopener" style="color:var(--c-green-bright);">(ver en Maps)</a>` : ""}</dd>
+          ${operacion.puntoEncuentro ? `<dt class="divider-coords">ENCUENTRO</dt><dd>${operacion.puntoEncuentro}${operacion.mapaPuntoEncuentro ? ` <a href="${operacion.mapaPuntoEncuentro}" target="_blank" rel="noopener" style="color:var(--c-green-bright);">(ver en Maps)</a>` : ""}</dd>` : ""}
+          <dt class="divider-coords">HORARIO</dt><dd>${operacion.horario}</dd>
+          <dt class="divider-coords">PRECIO</dt><dd>${operacion.precio} €${operacion.pago ? `<br><small style="color:var(--c-grey-dim);">${operacion.pago}</small>` : ""}</dd>
+        </dl>
+        ${availabilityHTML(operacion)}`;
+      if (hiddenOpId) hiddenOpId.value = operacion.id;
+    }
+
+    if (!op) {
+      if (form) form.closest(".form-card").style.display = "none";
+      if (summary) summary.closest(".info-card").style.display = "none";
+      if (notFound) notFound.style.display = "block";
+      return;
+    }
+
+    if (op.status !== "abiertas" && op.status !== "ultimas") {
+      summary.closest(".info-card").innerHTML = `<div class="empty-state">ESTA OPERACIÓN NO ADMITE NUEVAS INSCRIPCIONES (${ESTADO_TEXTO[op.status]}).<br><br><a class="btn btn-outline" href="operaciones.html">VER OTRAS OPERACIONES</a></div>`;
+      if (form) form.closest(".form-card").style.display = "none";
+      return;
+    }
+
+    renderSummary(op);
+
+    if (!form) return;
+
+    function setFieldError(field, message) {
+      const wrap = field.closest(".field");
+      if (!wrap) return;
+      wrap.classList.add("has-error");
+      const errEl = wrap.querySelector(".field__error");
+      if (errEl) errEl.textContent = message;
+    }
+    function clearFieldError(field) {
+      const wrap = field.closest(".field");
+      if (!wrap) return;
+      wrap.classList.remove("has-error");
+    }
+
+    function validateField(field) {
+      const name = field.name;
+      if (VALIDADORES[name]) {
+        const ok = VALIDADORES[name](field.value);
+        if (!ok) { setFieldError(field, MENSAJES_ERROR[name]); return false; }
+      }
+      clearFieldError(field);
+      return true;
+    }
+
+    form.querySelectorAll(".field input[name], .field select[name][required]").forEach((field) => {
+      field.addEventListener("blur", () => validateField(field));
+    });
+
+    function procesarInscripcion(payload) {
+      // Punto de integración futuro: Stripe Checkout Session / PayPal Orders API.
+      // De momento solo generamos un identificador visual de confirmación.
+      console.info("Inscripción registrada (demo, sin pago real):", payload);
+      return { ok: true, referencia: `GDO-${payload.operacionId.toUpperCase()}-${Date.now().toString().slice(-5)}` };
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      let valid = true;
+      form.querySelectorAll(".field input[name], .field select[name][required]").forEach((field) => {
+        if (!validateField(field)) valid = false;
+      });
+
+      const normas = form.querySelector('[name="acepta_normas"]');
+      const riesgos = form.querySelector('[name="acepta_riesgos"]');
+      const fotos = form.querySelector('[name="acepta_fotos"]');
+      [normas, riesgos, fotos].forEach((cb) => {
+        const wrap = cb.closest(".field-check");
+        if (!cb.checked) {
+          valid = false;
+          wrap.style.color = "var(--c-red-bright)";
+        } else {
+          wrap.style.color = "";
+        }
+      });
+
+      if (!valid) {
+        const firstError = form.querySelector(".has-error input, .has-error select, .field-check[style*='red']");
+        if (firstError) firstError.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      const data = new FormData(form);
+      const payload = {
+        operacionId: op.id,
+        nombre: data.get("nombre"),
+        apellidos: data.get("apellidos"),
+        dni: data.get("dni"),
+        telefono: data.get("telefono"),
+        email: data.get("email"),
+        callsign: data.get("callsign"),
+        equipo: data.get("equipo") || null,
+        experiencia: data.get("experiencia"),
+        observaciones: data.get("observaciones") || null,
+        aceptaFotos: data.get("acepta_fotos") === "on",
+      };
+
+      const resultado = procesarInscripcion(payload);
+      if (resultado.ok) {
+        form.style.display = "none";
+        successPanel.classList.add("is-visible");
+        successPanel.querySelector("[data-ref]").textContent = resultado.referencia;
+        successPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        const emailNote = successPanel.querySelector("[data-email-status]");
+        enviarBriefingPorEmail(payload, op).then((estado) => {
+          if (!emailNote) return;
+          emailNote.textContent = estado.enviado
+            ? `Te hemos enviado el briefing (fecha, horario y ubicación) a ${payload.email}.`
+            : `Guardaremos tu inscripción y te enviaremos el briefing a ${payload.email} en cuanto confirmemos los últimos detalles.`;
+        });
+        enviarNotificacionOrganizador(payload, op, resultado.referencia);
+        incrementarPlazasEnVivo();
+      }
+    });
+    });
+  });
+})();

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GUARDIANES DEL OLIVAR · Operaciones de Airsoft</title>
+<meta name="description" content="GUARDIANES DEL OLIVAR organiza operaciones de airsoft inmersivas: estrategia, adrenalina y compañerismo. Consulta el calendario, revisa el dossier de cada misión e inscríbete." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+
+<header class="navbar">
+  <div class="navbar__inner">
+    <a class="brand" href="index.html">
+      <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+      <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
+    </a>
+    <nav aria-label="Navegación principal">
+      <ul class="nav-links" data-nav-links>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="calendario.html">Calendario</a></li>
+        <li><a href="como-funciona.html">Cómo funciona</a></li>
+        <li><a href="normas.html">Normas</a></li>
+        <li><a href="galeria.html">Galería</a></li>
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-primary" href="calendario.html">INSCRÍBETE</a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <section class="section section--tight" style="border-bottom:var(--border-hairline);">
+    <div class="container" style="text-align:center;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:28px;margin-bottom:28px;flex-wrap:wrap;">
+        <img src="assets/foto%201.png" alt="Guardianes del Olivar — Airsoft Aragón" style="width:220px;height:220px;border-radius:50%;object-fit:cover;border:2px solid var(--c-green-bright);box-shadow:0 0 60px rgba(111,154,90,0.35);flex-shrink:0;" />
+        <div style="text-align:left;">
+          <h2 style="margin-bottom:6px;font-size:clamp(26px,4vw,38px);letter-spacing:0.05em;">GUARDIANES DEL OLIVAR</h2>
+          <p class="divider-coords" style="margin:0;">AIRSOFT ARAGÓN</p>
+        </div>
+      </div>
+      <span class="eyebrow" style="justify-content:center;">Cuenta atrás para la operación</span>
+      <h2 style="margin-bottom:28px;" data-countdown-title>—</h2>
+      <div class="countdown" data-countdown>
+        <div class="countdown__item"><span class="countdown__num" data-cd-days>00</span><span class="countdown__label">Días</span></div>
+        <div class="countdown__item"><span class="countdown__num" data-cd-hours>00</span><span class="countdown__label">Horas</span></div>
+        <div class="countdown__item"><span class="countdown__num" data-cd-mins>00</span><span class="countdown__label">Min</span></div>
+        <div class="countdown__item"><span class="countdown__num" data-cd-secs>00</span><span class="countdown__label">Seg</span></div>
+      </div>
+      <div style="margin-top:28px;">
+        <a class="btn btn-primary btn-lg" href="operaciones.html">VER DETALLES E INSCRIBIRME</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="stat-strip">
+    <div class="stat-strip__item">
+      <div class="stat-strip__label">Operadores online</div>
+      <div class="stat-strip__value accent" data-operators-online>—</div>
+    </div>
+    <div class="stat-strip__item">
+      <div class="stat-strip__label">Próxima operación</div>
+      <div class="stat-strip__value" data-next-op-name>—</div>
+    </div>
+    <div class="stat-strip__item">
+      <div class="stat-strip__label">Plazas libres totales</div>
+      <div class="stat-strip__value accent" data-plazas-libres>—</div>
+    </div>
+    <div class="stat-strip__item">
+      <div class="stat-strip__label">Hora local</div>
+      <div class="stat-strip__value" data-hud-clock>—</div>
+    </div>
+  </section>
+
+  <section class="hero">
+    <div class="hero__scan" aria-hidden="true"></div>
+    <div class="hero__corner hero__corner--tl" aria-hidden="true"></div>
+    <div class="hero__corner hero__corner--tr" aria-hidden="true"></div>
+    <div class="hero__content">
+      <div class="hud-row">
+        <span class="hud-chip"><span class="dot"></span>STATUS: OPERATIONAL</span>
+        <span class="hud-chip"><span class="dot"></span>NEXT OPERATION: <span data-next-op-date>—</span></span>
+        <span class="hud-chip is-alert"><span class="dot"></span>THREAT LEVEL: HIGH</span>
+        <span class="hud-chip is-warn"><span class="dot"></span>MISSION STATUS: ACTIVE</span>
+      </div>
+      <h1 class="hero__title">PREPÁRATE PARA<br />LA <span>MISIÓN</span></h1>
+      <p class="hero__subtitle">OPERACIONES DE AIRSOFT · EXPERIENCIAS · ESTRATEGIA · COMBATE</p>
+      <div class="hero__actions">
+        <a class="btn btn-primary btn-lg" href="calendario.html" data-hero-cta>VER PRÓXIMAS OPERACIONES</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="operaciones">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Centro de operaciones</span>
+        <h2>Próximas operaciones</h2>
+        <p class="lede">Estas son las próximas misiones activas. Cada operación tiene su propio dossier con briefing, objetivos y reglas específicas.</p>
+      </div>
+      <div class="ops-grid" data-home-ops></div>
+      <div style="text-align:center;margin-top:40px;">
+        <a class="btn btn-outline btn-lg" href="operaciones.html">VER TODAS LAS OPERACIONES</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Manual de la unidad</span>
+        <h2>Cómo funciona</h2>
+        <p class="lede">Seis pasos entre que descubres una operación y cumples la misión.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="step-card reveal"><div class="step-card__num">01</div><h3>Elige tu operación</h3><p>Consulta el calendario o el listado y elige la misión que se adapta a tu nivel y disponibilidad.</p></div>
+        <div class="step-card reveal"><div class="step-card__num">02</div><h3>Inscríbete</h3><p>Rellena el formulario de inscripción con tus datos y confirma tu plaza.</p></div>
+        <div class="step-card reveal"><div class="step-card__num">03</div><h3>Recibe el briefing</h3><p>Te enviamos toda la información: horarios, ubicación, objetivos y reglas especiales.</p></div>
+        <div class="step-card reveal"><div class="step-card__num">04</div><h3>Equípate</h3><p>Prepara tu réplica, tu protección y el equipo recomendado para el escenario.</p></div>
+        <div class="step-card reveal"><div class="step-card__num">05</div><h3>Entra en zona de operaciones</h3><p>Llega al punto de encuentro, pasa el cronógrafo a tu réplica y, en cuanto dé el visto bueno, únete a tu facción: ya estás dentro de la partida.</p></div>
+        <div class="step-card reveal"><div class="step-card__num">06</div><h3>Cumple la misión</h3><p>Ejecuta los objetivos, coordina con tu equipo y vive la operación hasta el final.</p></div>
+      </div>
+      <div style="text-align:center;margin-top:40px;">
+        <a class="btn btn-outline" href="como-funciona.html">VER MANUAL COMPLETO</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Quiénes somos</span>
+        <h2>Estrategia, adrenalina, compañerismo</h2>
+        <p class="lede">GUARDIANES DEL OLIVAR diseña operaciones de airsoft con narrativa propia, objetivos reales y una organización que cuida cada detalle de seguridad y logística.</p>
+      </div>
+      <blockquote class="pull-quote">"Cada partida tiene una historia. Cada operador tiene una misión."</blockquote>
+      <a class="btn btn-outline" href="nosotros.html">CONOCER LA ORGANIZACIÓN</a>
+    </div>
+  </section>
+
+  <section class="section section--alt">
+    <div class="container" style="text-align:center;">
+      <span class="eyebrow" style="justify-content:center;">Última llamada</span>
+      <h2 style="margin-bottom:18px;">¿LISTO PARA LA MISIÓN?</h2>
+      <p class="lede" style="margin:0 auto 32px;max-width:560px;">Revisa el calendario, elige tu operación y confirma tu plaza antes de que se agote.</p>
+      <div class="hero__actions" style="justify-content:center;">
+        <a class="btn btn-primary btn-lg" href="calendario.html">VER CALENDARIO</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div>
+        <div class="brand" style="margin-bottom:14px;">
+          <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+          <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
+        </div>
+        <p style="max-width:320px;font-size:13.5px;">Organización dedicada a crear operaciones de airsoft inmersivas basadas en estrategia, adrenalina y compañerismo.</p>
+      </div>
+      <div>
+        <h4>NAVEGACIÓN</h4>
+        <ul>
+          <li><a href="operaciones.html">Operaciones</a></li>
+          <li><a href="calendario.html">Calendario</a></li>
+          <li><a href="normas.html">Normas</a></li>
+          <li><a href="galeria.html">Galería</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>REDES Y CONTACTO</h4>
+        <ul>
+          <li><a href="https://www.instagram.com/airsoft_44500/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://chat.whatsapp.com/GrqcKiI6yVfJM8sWlZNhqt?s=cl&p=a&mlu=4&ilr=4" target="_blank" rel="noopener">WhatsApp</a></li>
+          <li><a href="mailto:guardianesdelolivar@gmail.com">guardianesdelolivar@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© <span data-year></span> GUARDIANES DEL OLIVAR. Todos los derechos reservados.</span>
+      <div class="footer__legal">
+        <a href="aviso-legal.html">Aviso legal</a>
+        <a href="privacidad.html">Política de privacidad</a>
+        <a href="cookies.html">Política de cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/data/operaciones.js"></script>
+<script src="assets/js/live-count.js"></script>
+<script src="assets/js/cards.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/home.js"></script>
+<script src="assets/js/countdown.js"></script>
+</body>
+</html>

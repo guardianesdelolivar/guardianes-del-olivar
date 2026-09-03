@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dossier de operación · GUARDIANES DEL OLIVAR</title>
+<meta name="description" content="Dossier de misión de GUARDIANES DEL OLIVAR: briefing, objetivos, reglas especiales y todo lo necesario para participar." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+
+<header class="navbar">
+  <div class="navbar__inner">
+    <a class="brand" href="index.html">
+      <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+      <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
+    </a>
+    <nav aria-label="Navegación principal">
+      <ul class="nav-links" data-nav-links>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="calendario.html">Calendario</a></li>
+        <li><a href="como-funciona.html">Cómo funciona</a></li>
+        <li><a href="normas.html">Normas</a></li>
+        <li><a href="galeria.html">Galería</a></li>
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-primary" href="calendario.html">INSCRÍBETE</a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div data-dossier-not-found style="display:none;" class="page-header">
+    <div class="container" style="text-align:center;">
+      <span class="eyebrow" style="justify-content:center;">Expediente no localizado</span>
+      <h1 style="margin-bottom:16px;">OPERACIÓN NO ENCONTRADA</h1>
+      <p class="lede" style="max-width:520px;margin:0 auto 26px;">El dossier que buscas no existe o ha sido retirado del archivo. Consulta el listado completo de operaciones activas.</p>
+      <a class="btn btn-primary" href="operaciones.html">VER OPERACIONES</a>
+    </div>
+  </div>
+
+  <div data-dossier-root>
+    <div class="dossier-header">
+      <div class="container">
+        <div class="dossier-tag-row">
+          <span class="tag" data-op-clasificacion>CLASSIFICATION</span>
+          <span class="tag" data-op-tipo>TIPO</span>
+          <span class="tag" data-op-dificultad-tag>NIVEL</span>
+          <span class="tag" data-op-status>MISSION STATUS</span>
+        </div>
+        <span class="badge" data-op-badge style="position:static;display:inline-flex;margin-bottom:16px;"><span class="dot"></span>ESTADO</span>
+        <h1 class="dossier-title" data-op-nombre>—</h1>
+        <p class="dossier-sub" data-op-codigo>—</p>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container">
+        <div class="dossier-grid">
+          <div>
+            <div class="dossier-block">
+              <p class="lede" data-op-resumen>—</p>
+            </div>
+            <div class="dossier-block">
+              <h3>Historia de la operación</h3>
+              <p data-op-historia>—</p>
+            </div>
+            <div class="dossier-block">
+              <h3>Briefing</h3>
+              <p data-op-briefing>—</p>
+            </div>
+            <div class="dossier-block">
+              <h3>Objetivos</h3>
+              <ul class="checklist" data-op-objetivos></ul>
+            </div>
+            <div class="dossier-block">
+              <h3>Misiones</h3>
+              <div class="mission-list" data-op-misiones></div>
+            </div>
+            <div class="dossier-block" data-op-reglas-block>
+              <h3>Reglas especiales</h3>
+              <ul class="rules-list" data-op-reglas></ul>
+            </div>
+          </div>
+
+          <aside>
+            <div class="info-card">
+              <h3 style="margin-bottom:16px;">Ficha de la misión</h3>
+              <dl>
+                <dt>Fecha</dt><dd data-op-fecha>—</dd>
+                <dt>Horario</dt><dd data-op-horario>—</dd>
+                <dt>Lugar</dt><dd data-op-lugar>—</dd>
+                <dt>Precio</dt><dd data-op-precio>—</dd>
+                <dt>Dificultad</dt><dd data-op-dificultad>—</dd>
+                <dt>Facciones</dt><dd data-op-facciones>—</dd>
+                <dt>Máx. participantes</dt><dd data-op-max>—</dd>
+              </dl>
+              <div data-op-availability style="margin-bottom:18px;"></div>
+              <div data-op-checklist-block style="margin-bottom:6px;">
+                <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;color:var(--c-grey);text-transform:uppercase;margin-bottom:8px;">Qué llevar</h4>
+                <ul class="checklist" data-op-checklist></ul>
+              </div>
+              <a class="btn btn-primary btn-block btn-lg" data-op-cta href="#" style="margin-top:16px;">INICIAR INSCRIPCIÓN</a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div>
+        <div class="brand" style="margin-bottom:14px;">
+          <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+          <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
+        </div>
+        <p style="max-width:320px;font-size:13.5px;">Organización dedicada a crear operaciones de airsoft inmersivas basadas en estrategia, adrenalina y compañerismo.</p>
+      </div>
+      <div>
+        <h4>NAVEGACIÓN</h4>
+        <ul>
+          <li><a href="operaciones.html">Operaciones</a></li>
+          <li><a href="calendario.html">Calendario</a></li>
+          <li><a href="normas.html">Normas</a></li>
+          <li><a href="galeria.html">Galería</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>REDES Y CONTACTO</h4>
+        <ul>
+          <li><a href="https://www.instagram.com/airsoft_44500/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://chat.whatsapp.com/GrqcKiI6yVfJM8sWlZNhqt?s=cl&p=a&mlu=4&ilr=4" target="_blank" rel="noopener">WhatsApp</a></li>
+          <li><a href="mailto:guardianesdelolivar@gmail.com">guardianesdelolivar@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© <span data-year></span> GUARDIANES DEL OLIVAR. Todos los derechos reservados.</span>
+      <div class="footer__legal">
+        <a href="aviso-legal.html">Aviso legal</a>
+        <a href="privacidad.html">Política de privacidad</a>
+        <a href="cookies.html">Política de cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/data/operaciones.js"></script>
+<script src="assets/js/live-count.js"></script>
+<script src="assets/js/cards.js"></script>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/operacion.js"></script>
+</body>
+</html>
