@@ -79,3 +79,37 @@ function enviarComentario(opId, nombre, texto) {
 }
 window.listarComentarios = listarComentarios;
 window.enviarComentario = enviarComentario;
+
+/**
+ * REGISTRO DE INSCRIPCIONES EN HOJA DE CÁLCULO — usa el mismo Apps Script
+ * (pestaña "Inscripciones" aparte). Cada inscripción confirmada añade una
+ * fila con los datos del operador, para tener siempre a mano quién viene.
+ * Requiere que el script tenga la acción inscripcion_nueva añadida.
+ */
+function registrarInscripcion(datos) {
+  if (!contadorConfigurado()) return Promise.resolve(null);
+  const params = new URLSearchParams({
+    action: "inscripcion_nueva",
+    referencia: datos.referencia || "",
+    operacion: datos.operacion || "",
+    nombre: datos.nombre || "",
+    apellidos: datos.apellidos || "",
+    dni: datos.dni || "",
+    telefono: datos.telefono || "",
+    email: datos.email || "",
+    callsign: datos.callsign || "",
+    equipo: datos.equipo || "",
+    experiencia: datos.experiencia || "",
+    almuerzo: datos.almuerzo || "",
+    precio_total: datos.precio_total || "",
+    fotos: datos.fotos || "",
+    observaciones: datos.observaciones || "",
+  });
+  return fetch(`${CONTADOR_URL}?${params.toString()}`)
+    .then((r) => r.json())
+    .catch((err) => {
+      console.error("No se pudo registrar la inscripción en la hoja de cálculo:", err);
+      return null;
+    });
+}
+window.registrarInscripcion = registrarInscripcion;

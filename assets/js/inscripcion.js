@@ -17,6 +17,10 @@
  * Para que el envío sea REAL hace falta una cuenta gratuita en
  * https://www.emailjs.com (no requiere servidor propio). Una vez
  * creada, rellenad estos 3 valores con los que os da EmailJS:
+ *
+ * RENDIMIENTO: el formulario se pinta y queda interactivo de inmediato,
+ * sin esperar al contador de plazas en vivo. Cuando llega ese dato se
+ * refresca solo el resumen (badge/disponibilidad), sin bloquear la carga.
  */
 const EMAILJS_CONFIG = {
   serviceId: "service_wefeffr",
@@ -137,7 +141,6 @@ const EMAILJS_CONFIG = {
   };
 
   document.addEventListener("DOMContentLoaded", () => {
-    (window.PLAZAS_LISTO || Promise.resolve()).finally(() => {
     const id = getParam("op");
     const op = id ? obtenerOperacionPorId(id) : null;
     const summary = document.querySelector("[data-inscripcion-summary]");
@@ -194,8 +197,32 @@ const EMAILJS_CONFIG = {
     }
 
     renderSummary(op);
+    // Cuando llegue el número real de plazas, refrescamos solo el resumen
+    // (badge y barra de disponibilidad), sin bloquear la carga del formulario.
+    (window.PLAZAS_LISTO || Promise.resolve()).then(() => renderSummary(op));
 
     if (!form) return;
+
+    // Si hay sesión iniciada (Supabase), rellenamos el formulario con el
+    // perfil guardado del operador, para no tener que escribirlo cada vez.
+    let usuarioActual = null;
+    if (window.obtenerUsuarioActual && window.obtenerPerfil) {
+      window.obtenerUsuarioActual().then((user) => {
+        if (!user) return;
+        usuarioActual = user;
+        const emailField = form.querySelector('[name="email"]');
+        if (emailField && !emailField.value) emailField.value = user.email;
+        window.obtenerPerfil(user.id).then((perfil) => {
+          if (!perfil) return;
+          ["nombre", "apellidos", "dni", "telefono", "callsign", "equipo"].forEach((campo) => {
+            const input = form.querySelector(`[name="${campo}"]`);
+            if (input && !input.value && perfil[campo]) input.value = perfil[campo];
+          });
+          const expSelect = form.querySelector('[name="experiencia"]');
+          if (expSelect && !expSelect.value && perfil.experiencia) expSelect.value = perfil.experiencia;
+        });
+      });
+    }
 
     function setFieldError(field, message) {
       const wrap = field.closest(".field");
@@ -337,8 +364,36 @@ const EMAILJS_CONFIG = {
         });
         enviarNotificacionOrganizador(payload, op, resultado.referencia);
         incrementarPlazasEnVivo();
+        if (usuarioActual && window.guardarPerfil) {
+          window.guardarPerfil(usuarioActual.id, {
+            nombre: payload.nombre,
+            apellidos: payload.apellidos,
+            dni: payload.dni,
+            telefono: payload.telefono,
+            callsign: payload.callsign,
+            equipo: payload.equipo || "",
+            experiencia: payload.experiencia,
+          });
+        }
+        if (window.registrarInscripcion) {
+          window.registrarInscripcion({
+            referencia: resultado.referencia,
+            operacion: op.nombre,
+            nombre: payload.nombre,
+            apellidos: payload.apellidos,
+            dni: payload.dni,
+            telefono: payload.telefono,
+            email: payload.email,
+            callsign: payload.callsign,
+            equipo: payload.equipo || "",
+            experiencia: payload.experiencia,
+            almuerzo: payload.quiereAlmuerzo ? payload.almuerzo : "No almuerza",
+            precio_total: `${payload.precioFinal} €`,
+            fotos: payload.aceptaFotos ? "Sí" : "No",
+            observaciones: payload.observaciones || "",
+          });
+        }
       }
-    });
     });
   });
 })();

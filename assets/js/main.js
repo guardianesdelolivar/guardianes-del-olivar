@@ -100,6 +100,21 @@
     }, 4000);
   }
 
+  // Aviso de cookies — se muestra una vez por navegador hasta que se acepta.
+  function initCookieBanner() {
+    if (localStorage.getItem("gdo_cookies_aceptadas") === "1") return;
+    const banner = document.createElement("div");
+    banner.className = "cookie-banner";
+    banner.innerHTML = `
+      <p>Usamos almacenamiento técnico necesario para que funcione la web (por ejemplo, para mantener tu sesión iniciada). No usamos cookies de publicidad ni de analítica. Más info en nuestra <a href="cookies.html">Política de cookies</a>.</p>
+      <button type="button" class="btn btn-primary" data-cookie-aceptar>ENTENDIDO</button>`;
+    document.body.appendChild(banner);
+    banner.querySelector("[data-cookie-aceptar]").addEventListener("click", () => {
+      localStorage.setItem("gdo_cookies_aceptadas", "1");
+      banner.remove();
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initNavToggle();
     markActiveLink();
@@ -107,5 +122,6 @@
     initFooterYear();
     reScanReveal();
     initOperatorsOnline();
+    initCookieBanner();
   });
 })();

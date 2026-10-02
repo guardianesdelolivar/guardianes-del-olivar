@@ -1,6 +1,11 @@
 /**
  * OPERACION.JS — renderiza el dossier de una operación concreta
  * a partir del parámetro ?op=slug, leyendo assets/js/data/operaciones.js.
+ *
+ * RENDIMIENTO: todo el dossier se pinta de inmediato con los datos que ya
+ * hay. Solo la parte que depende del contador de plazas en vivo (barra de
+ * disponibilidad, badge de estado y botón de inscripción) se actualiza
+ * aparte cuando llega esa respuesta, sin bloquear la carga del resto.
  */
 
 (function () {
@@ -11,7 +16,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    (window.PLAZAS_LISTO || Promise.resolve()).finally(() => {
     const id = getParam("op");
     const op = id ? obtenerOperacionPorId(id) : null;
     const root = document.querySelector("[data-dossier-root]");
@@ -35,12 +39,9 @@
 
     document.querySelector("[data-op-tipo]").textContent = op.tipo;
     document.querySelector("[data-op-dificultad-tag]").textContent = `NIVEL: ${op.dificultad.toUpperCase()}`;
-    document.querySelector("[data-op-status]").textContent = `MISSION STATUS: ${op.status === "finalizado" ? "CLOSED" : "ACTIVE"}`;
 
     document.querySelector("[data-op-nombre]").textContent = op.nombre;
     document.querySelector("[data-op-codigo]").textContent = `${op.codigo} · ${op.fechaDisplay} · ${op.ubicacion}, ${op.localidad}`;
-
-    document.querySelector("[data-op-badge]").outerHTML = `<span class="badge ${ESTADO_BADGE_CLASS[op.status]}" style="position:static;display:inline-flex;" data-op-badge><span class="dot"></span>${ESTADO_TEXTO[op.status]}</span>`;
 
     document.querySelector("[data-op-resumen]").textContent = op.resumen;
     document.querySelector("[data-op-historia]").textContent = op.historia;
@@ -84,8 +85,6 @@
     document.querySelector("[data-op-facciones]").textContent = op.facciones.join(" vs ");
     document.querySelector("[data-op-max]").textContent = `${op.maxParticipantes} operadores`;
 
-    document.querySelector("[data-op-availability]").innerHTML = availabilityHTML(op);
-
     const checklist = document.querySelector("[data-op-checklist]");
     const checklistBlock = document.querySelector("[data-op-checklist-block]");
     if (op.queLlevar.length) {
@@ -94,20 +93,37 @@
       checklistBlock.style.display = "none";
     }
 
-    const ctaBtn = document.querySelector("[data-op-cta]");
-    const inscribible = op.status === "abiertas" || op.status === "ultimas";
-    if (inscribible) {
-      ctaBtn.href = `inscripcion.html?op=${op.id}`;
-      ctaBtn.textContent = "INICIAR INSCRIPCIÓN";
-    } else {
-      ctaBtn.removeAttribute("href");
-      ctaBtn.textContent = op.status === "completo" ? "OPERACIÓN COMPLETA" : "OPERACIÓN FINALIZADA";
-      ctaBtn.classList.add("btn-outline");
-      ctaBtn.classList.remove("btn-primary");
-      ctaBtn.setAttribute("aria-disabled", "true");
-      ctaBtn.style.pointerEvents = "none";
-      ctaBtn.style.opacity = "0.5";
+    // --- Bloque que depende del número de plazas en vivo ---
+    // Se pinta ya con el dato que haya disponible, y se vuelve a pintar
+    // (sin duplicar nada, solo reemplaza contenido) cuando llega el
+    // número real del contador, sin bloquear el resto del dossier.
+    function pintarDisponibilidad() {
+      document.querySelector("[data-op-badge]").outerHTML = `<span class="badge ${ESTADO_BADGE_CLASS[op.status]}" style="position:static;display:inline-flex;" data-op-badge><span class="dot"></span>${ESTADO_TEXTO[op.status]}</span>`;
+      document.querySelector("[data-op-status]").textContent = `MISSION STATUS: ${op.status === "finalizado" ? "CLOSED" : "ACTIVE"}`;
+      document.querySelector("[data-op-availability]").innerHTML = availabilityHTML(op);
+
+      const ctaBtn = document.querySelector("[data-op-cta]");
+      const inscribible = op.status === "abiertas" || op.status === "ultimas";
+      if (inscribible) {
+        ctaBtn.href = `inscripcion.html?op=${op.id}`;
+        ctaBtn.textContent = "INICIAR INSCRIPCIÓN";
+        ctaBtn.classList.add("btn-primary");
+        ctaBtn.classList.remove("btn-outline");
+        ctaBtn.removeAttribute("aria-disabled");
+        ctaBtn.style.pointerEvents = "";
+        ctaBtn.style.opacity = "";
+      } else {
+        ctaBtn.removeAttribute("href");
+        ctaBtn.textContent = op.status === "completo" ? "OPERACIÓN COMPLETA" : "OPERACIÓN FINALIZADA";
+        ctaBtn.classList.add("btn-outline");
+        ctaBtn.classList.remove("btn-primary");
+        ctaBtn.setAttribute("aria-disabled", "true");
+        ctaBtn.style.pointerEvents = "none";
+        ctaBtn.style.opacity = "0.5";
+      }
     }
+    pintarDisponibilidad();
+    (window.PLAZAS_LISTO || Promise.resolve()).then(pintarDisponibilidad);
 
     // Comentarios
     function escapeHTML(str) {
@@ -162,6 +178,5 @@
         });
       });
     }
-    });
   });
 })();

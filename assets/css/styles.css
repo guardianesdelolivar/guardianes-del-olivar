@@ -238,7 +238,7 @@ p { color: var(--c-grey); }
   .nav-links a { padding: 16px 24px; border-bottom: 1px solid rgba(233,231,222,0.06); border-left: 2px solid transparent; }
   .nav-links a:hover, .nav-links a[aria-current="page"] { border-left-color: var(--c-green-bright); border-color: transparent; border-left: 2px solid var(--c-green-bright); background: rgba(111,154,90,0.06); }
   .nav-toggle { display: flex; }
-  .nav-actions .btn-primary { padding: 10px 16px; font-size: 11px; }
+  .nav-actions .btn-primary, .nav-actions [data-auth-link] { padding: 10px 14px; font-size: 10.5px; }
 }
 
 body { padding-top: var(--header-h); }
@@ -717,3 +717,24 @@ body { padding-top: var(--header-h); }
 .skip-link:focus { left: 10px; top: 10px; }
 
 ::selection { background: var(--c-green-bright); color: #0d130c; }
+
+/* ---------- Aviso de cookies ---------- */
+.cookie-banner {
+  position: fixed;
+  left: 20px; right: 20px; bottom: 20px;
+  z-index: 9500;
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--c-carbon);
+  border: var(--border-hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-deep);
+  padding: 20px 22px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+.cookie-banner p { font-size: 13px; color: var(--c-off-white); opacity: 0.85; flex: 1; min-width: 220px; }
+.cookie-banner a { color: var(--c-green-bright); text-decoration: underline; text-underline-offset: 2px; }
+.cookie-banner .btn { white-space: nowrap; }

@@ -1,6 +1,11 @@
 /**
  * CALENDAR.JS — calendario mensual interactivo.
  * Pensado para funcionar cómodamente también en móvil (celdas táctiles grandes).
+ *
+ * RENDIMIENTO: la página se pinta de inmediato con los datos que ya hay
+ * (sin esperar a la respuesta del contador de plazas en vivo, que puede
+ * tardar un poco). En cuanto llega esa respuesta, se vuelve a pintar solo
+ * para refrescar el número de plazas, sin bloquear la carga inicial.
  */
 
 (function () {
@@ -14,7 +19,6 @@
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    (window.PLAZAS_LISTO || Promise.resolve()).finally(() => {
     const monthLabel = document.querySelector("[data-cal-month]");
     const grid = document.querySelector("[data-cal-grid]");
     const prevBtn = document.querySelector("[data-cal-prev]");
@@ -177,10 +181,16 @@
       render();
     });
 
+    // Pintado inmediato: no se espera a la respuesta del contador de plazas.
     render();
     if (opParam && window.matchMedia("(max-width: 899px)").matches) {
       detail.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
+
+    // Cuando llega el número real de plazas (puede tardar un poco), se
+    // repinta solo para refrescarlo, sin bloquear la carga inicial.
+    (window.PLAZAS_LISTO || Promise.resolve()).then(() => {
+      render();
     });
   });
 })();
