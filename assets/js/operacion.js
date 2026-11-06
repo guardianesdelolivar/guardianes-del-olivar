@@ -106,6 +106,7 @@
     document.querySelector("[data-op-dificultad-tag]").textContent = `NIVEL: ${op.dificultad.toUpperCase()}`;
 
     document.querySelector("[data-op-nombre]").textContent = op.nombre;
+    if (window.descifrar) window.descifrar(document.querySelector("[data-op-nombre]"));
     document.querySelector("[data-op-codigo]").textContent = `${op.codigo} · ${op.fechaDisplay} · ${op.ubicacion}, ${op.localidad}`;
 
     document.querySelector("[data-op-resumen]").textContent = op.resumen;
@@ -122,7 +123,7 @@
     document.querySelector("[data-op-historia]").textContent = op.historia;
     document.querySelector("[data-op-briefing]").textContent = op.briefing;
 
-    document.querySelector("[data-op-objetivos]").innerHTML = op.objetivos.map((o) => `<li>${o.icono} ${o.texto}</li>`).join("");
+    document.querySelector("[data-op-objetivos]").innerHTML = op.objetivos.map((o) => `<li class="has-ico">${icono(o.icono)}<span>${o.texto}</span></li>`).join("");
 
     document.querySelector("[data-op-misiones]").innerHTML = op.misiones.map((m) => `
       <div class="mission-item">

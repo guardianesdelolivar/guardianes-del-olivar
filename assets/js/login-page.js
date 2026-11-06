@@ -29,6 +29,25 @@
       location.href = volver;
       return true;
     }
+    // Página desde la que se llegó a "Mi cuenta" (de esta misma web), para
+    // volver allí después de guardar el perfil.
+    let paginaAnterior = null;
+    try {
+      const ref = document.referrer ? new URL(document.referrer) : null;
+      if (ref && ref.origin === location.origin && !/login\.html$/.test(ref.pathname)) {
+        paginaAnterior = ref.pathname.split("/").pop() + ref.search;
+        sessionStorage.setItem("gdo_desde", paginaAnterior);
+      } else {
+        paginaAnterior = sessionStorage.getItem("gdo_desde");
+      }
+    } catch (err) { /* se ignora */ }
+    function volverTrasGuardar() {
+      if (irADestino()) return;
+      const destino = paginaAnterior && /^[a-z0-9-]*\.html(\?[a-z0-9=&-]*)?$/i.test(paginaAnterior) ? paginaAnterior : "index.html";
+      try { sessionStorage.removeItem("gdo_desde"); } catch (err) { /* se ignora */ }
+      location.href = destino;
+    }
+
     if (volver) {
       const aviso = document.querySelector("[data-volver-aviso]");
       if (aviso) aviso.hidden = false;
@@ -208,13 +227,14 @@
             if (avatarUrl) datos.avatar_url = avatarUrl;
             window.guardarPerfil(user.id, datos).then((ok) => {
               if (perfilMsg) {
-                perfilMsg.textContent = ok ? "Perfil guardado correctamente." : "No se pudo guardar el perfil.";
+                perfilMsg.textContent = ok ? "Perfil guardado. Volviendo…" : "No se pudo guardar el perfil.";
                 perfilMsg.style.color = ok ? "var(--c-green-bright)" : "var(--c-red-bright)";
               }
               if (ok && avatarUrl) {
                 mostrarAvatar(avatarUrl);
                 if (avatarInput) avatarInput.value = "";
               }
+              if (ok) setTimeout(volverTrasGuardar, 1200);
             });
           });
         });

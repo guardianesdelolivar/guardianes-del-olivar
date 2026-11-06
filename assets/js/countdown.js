@@ -34,6 +34,14 @@
     const sEl = document.querySelector("[data-cd-secs]");
 
     function pad(n) { return String(n).padStart(2, "0"); }
+    // Pone el número y lo hace "saltar" solo si ha cambiado.
+    function poner(el, valor) {
+      if (!el || el.textContent === valor) return;
+      el.textContent = valor;
+      el.classList.remove("is-tick");
+      void el.offsetWidth;
+      el.classList.add("is-tick");
+    }
 
     let timer;
     function tick() {
@@ -48,10 +56,10 @@
       const hours = Math.floor((diff % 86400000) / 3600000);
       const mins = Math.floor((diff % 3600000) / 60000);
       const secs = Math.floor((diff % 60000) / 1000);
-      if (dEl) dEl.textContent = pad(days);
-      if (hEl) hEl.textContent = pad(hours);
-      if (mEl) mEl.textContent = pad(mins);
-      if (sEl) sEl.textContent = pad(secs);
+      poner(dEl, pad(days));
+      poner(hEl, pad(hours));
+      poner(mEl, pad(mins));
+      poner(sEl, pad(secs));
     }
 
     tick();

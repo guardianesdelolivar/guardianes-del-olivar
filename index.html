@@ -54,7 +54,7 @@
   <section class="section section--tight" style="border-bottom:var(--border-hairline);">
     <div class="container" style="text-align:center;">
       <div style="display:flex;align-items:center;justify-content:center;gap:28px;margin-bottom:28px;flex-wrap:wrap;">
-        <img src="assets/logo.webp" alt="Guardianes del Olivar — Airsoft Aragón" width="220" height="220" fetchpriority="high" decoding="async" style="width:220px;height:220px;border-radius:50%;object-fit:cover;border:2px solid var(--c-green-bright);box-shadow:0 0 60px rgba(111,154,90,0.35);flex-shrink:0;" />
+        <span class="radar-logo"><img src="assets/logo.webp" alt="Guardianes del Olivar — Airsoft Aragón" width="220" height="220" fetchpriority="high" decoding="async" style="width:220px;height:220px;border-radius:50%;object-fit:cover;border:2px solid var(--c-green-bright);box-shadow:0 0 60px rgba(111,154,90,0.35);flex-shrink:0;" /></span>
         <div style="text-align:left;">
           <h2 style="margin-bottom:6px;font-size:clamp(26px,4vw,38px);letter-spacing:0.05em;">GUARDIANES DEL OLIVAR</h2>
           <p class="divider-coords" style="margin:0;">AIRSOFT ARAGÓN</p>
@@ -93,7 +93,10 @@
     </div>
   </section>
 
+  <div class="ticker" data-ticker hidden aria-hidden="true"><div class="ticker__track" data-ticker-track></div></div>
+
   <section class="hero">
+    <div class="hero__topo" aria-hidden="true"></div>
     <div class="hero__scan" aria-hidden="true"></div>
     <div class="hero__corner hero__corner--tl" aria-hidden="true"></div>
     <div class="hero__corner hero__corner--tr" aria-hidden="true"></div>
@@ -101,6 +104,7 @@
       <div class="hud-row">
         <span class="hud-chip"><span class="dot"></span>STATUS: OPERATIONAL</span>
         <span class="hud-chip" data-hero-next-chip><span class="dot"></span>NEXT OPERATION: <span data-next-op-date>—</span></span>
+        <span class="hud-chip"><span class="dot"></span>SECTOR: ESTERCUEL · TERUEL</span>
         <span class="hud-chip is-alert"><span class="dot"></span>THREAT LEVEL: HIGH</span>
         <span class="hud-chip is-warn"><span class="dot"></span>MISSION STATUS: ACTIVE</span>
       </div>

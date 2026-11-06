@@ -45,16 +45,46 @@
       if (librasEl) {
         if (!abiertas.length) librasEl.textContent = "—";
         else if (abiertas.some((op) => !tieneLimitePlazas(op))) librasEl.textContent = "Sin límite";
-        else librasEl.textContent = totalLibres;
+        else if (librasEl.dataset.animado !== String(totalLibres) && window.animarNumero) {
+          librasEl.dataset.animado = String(totalLibres);
+          window.animarNumero(librasEl, totalLibres);
+        } else librasEl.textContent = totalLibres;
       }
 
       const activasEl = document.querySelector("[data-ops-activas]");
       if (activasEl) {
-        activasEl.textContent = OPERACIONES.filter((op) => op.status !== "finalizado").length;
+        const activas = OPERACIONES.filter((op) => op.status !== "finalizado").length;
+        if (activasEl.dataset.animado !== String(activas) && window.animarNumero) {
+          activasEl.dataset.animado = String(activas);
+          window.animarNumero(activasEl, activas);
+        } else activasEl.textContent = activas;
       }
     }
 
+    // Franja de teletipo con los datos reales de la próxima operación.
+    function pintarTeletipo() {
+      const cinta = document.querySelector("[data-ticker]");
+      const pista = document.querySelector("[data-ticker-track]");
+      if (!cinta || !pista) return;
+      const op = ordenarOperacionesPorFecha(OPERACIONES.filter((o) => o.status !== "finalizado"))[0];
+      if (!op) { cinta.hidden = true; return; }
+      const piezas = [
+        `PRÓXIMA OPERACIÓN: ${op.nombre}`,
+        op.fechaDisplay,
+        `${op.horaInicio} H`,
+        `${op.ubicacion.toUpperCase()}, ${op.localidad.toUpperCase()}`,
+        `${op.precio} € POR JUGADOR`,
+        op.plazasTotal ? `${Math.max(0, op.plazasTotal - op.plazasOcupadas)} DE ${op.plazasTotal} PLAZAS LIBRES` : "PLAZAS SIN LÍMITE",
+        ESTADO_TEXTO[op.status],
+      ];
+      const bloque = piezas.map((p) => `<span>${p}</span><i></i>`).join("");
+      pista.innerHTML = bloque + bloque;
+      cinta.hidden = false;
+    }
+
     pintar();
+    pintarTeletipo();
+    (window.PLAZAS_LISTO || Promise.resolve()).then(pintarTeletipo);
     (window.PLAZAS_LISTO || Promise.resolve()).then(pintar);
   });
 })();

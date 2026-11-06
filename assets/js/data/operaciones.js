@@ -21,9 +21,9 @@
 const OPERACIONES = [
   {
     id: "partida-24h-noviembre",
-    codigo: "OP-2611-24H",
-    nombre: "PARTIDA DE 24 HORAS",
-    tipo: "Partida 24 horas",
+    codigo: "OP-2611-24H-II",
+    nombre: "PARTIDA 24 HORAS · 2ª EDICIÓN",
+    tipo: "Partida 24 horas · 2ª edición",
     clasificacion: "PUBLIC",
     fecha: "2026-11-14",
     fechaDisplay: "14 NOVIEMBRE 2026",
@@ -46,11 +46,11 @@ const OPERACIONES = [
     dificultad: "Todos los niveles",
     facciones: [],
     objetivos: [
-      { icono: "🕒", texto: "24 horas de partida, de día y de noche" },
-      { icono: "⛺", texto: "Noche en el campo, en carpa y saco (opcional)" }
+      { icono: "reloj", texto: "24 horas de partida, de día y de noche" },
+      { icono: "tienda", texto: "Noche en el campo, en carpa y saco (opcional)" }
     ],
-    resumen: "Partida de 24 horas en el campo de Guardianes del Olivar. Se hace noche en el campo, y si no quieres dormir allí, juega desde por la mañana hasta que te canses.",
-    historia: "Sábado 14 de noviembre de 2026. Por primera vez, Guardianes del Olivar organiza una partida de 24 horas en el Campo de Airsoft de Estercuel (Teruel). Se juega de día y de noche, con la carpa montada en el campo para quien quiera quedarse a dormir.",
+    resumen: "Vuelve la partida de 24 horas: segunda edición en el campo de Guardianes del Olivar. Se hace noche en el campo, y si no quieres dormir allí, juega desde por la mañana hasta que te canses.",
+    historia: "Sábado 14 de noviembre de 2026. Llega la segunda edición de la partida de 24 horas de Guardianes del Olivar en el Campo de Airsoft de Estercuel (Teruel). Se juega de día y de noche, con la carpa montada en el campo para quien quiera quedarse a dormir.",
     briefing: "Empezamos a las 08:00 h en el propio campo. La partida dura 24 horas, pero no hace falta aguantarlas todas: puedes venir desde por la mañana y jugar hasta que te canses. Para quien quiera hacer noche, montamos una carpa donde dormir en saco de dormir. No hay servicio de comida: cada uno trae la suya y el agua para toda la jornada. El pago (15 €) se hace en efectivo en el propio campo, al rellenar la documentación. Los modos de juego se explican en el briefing del día.",
     misiones: [
       { numero: "01", titulo: "Llegada al campo", detalle: "08:00 h en el Campo de Guardianes del Olivar. Documentación, pago y revisión de réplicas antes de empezar." },
@@ -90,8 +90,8 @@ const OPERACIONES = [
     dificultad: "Todos los niveles",
     facciones: ["Escuadrón Cuervo", "Escuadrón Lobo"],
     objetivos: [
-      { icono: "💣", texto: "Desactiva la bomba" },
-      { icono: "🚩", texto: "Captura la bandera" }
+      { icono: "bomba", texto: "Desactiva la bomba" },
+      { icono: "bandera", texto: "Captura la bandera" }
     ],
     resumen: "Primera operación oficial de Guardianes del Olivar. Avanza. Combate. Sobrevive.",
     historia: "17 de octubre de 2026. La guerra comienza. La primera partida especial de Guardianes del Olivar se juega en el Campo de Airsoft de Estercuel (Teruel), con dos misiones sobre la mesa: desactivar la bomba y capturar la bandera.",

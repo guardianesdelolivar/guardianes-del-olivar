@@ -115,6 +115,18 @@ function pintarEstadoSesion() {
       link.setAttribute("data-auth-link", "");
       navActions.insertBefore(link, navActions.firstChild);
     }
+    // En el móvil el enlace de cuenta va dentro del menú, para que la
+    // barra superior no se salga de la pantalla.
+    const menu = document.querySelector("[data-nav-links]");
+    if (menu && !menu.querySelector("[data-menu-cuenta]")) {
+      const li = document.createElement("li");
+      li.className = "nav-links__cuenta";
+      li.innerHTML = '<a href="login.html" data-menu-cuenta></a>';
+      menu.appendChild(li);
+    }
+    const menuCuenta = menu ? menu.querySelector("[data-menu-cuenta]") : null;
+    if (menuCuenta) menuCuenta.textContent = user ? "Mi cuenta" : "Crear cuenta / Entrar";
+
     if (user) {
       link.textContent = "MI CUENTA";
       link.href = "login.html";
