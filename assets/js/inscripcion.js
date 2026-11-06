@@ -64,6 +64,13 @@ const EMAILJS_CONFIG = {
         precio: `${payload.precioFinal} €`,
         almuerzo: payload.quiereAlmuerzo ? payload.almuerzo : "No almuerza",
         callsign: payload.callsign,
+        codigo: operacion.codigo,
+        punto_encuentro: operacion.puntoEncuentro || `${operacion.ubicacion}, ${operacion.localidad}`,
+        pago: operacion.pago || "",
+        duerme: operacion.pernocta ? (payload.duerme ? "Sí, duermes en el campo" : "No") : "—",
+        que_llevar: (operacion.queLlevar || []).join(" · "),
+        enlace_dossier: `https://www.gdoaragon.es/operacion.html?op=${operacion.id}`,
+        enlace_mapa: operacion.mapaUbicacion || "",
       })
       .then(() => ({ enviado: true }))
       .catch((err) => {
@@ -99,6 +106,9 @@ const EMAILJS_CONFIG = {
         consentimiento_fotos: payload.aceptaFotos ? "Sí" : "No",
         almuerzo: payload.quiereAlmuerzo ? payload.almuerzo : "No almuerza",
         precio_total: `${payload.precioFinal} €`,
+        duerme: operacion.pernocta ? (payload.duerme ? "Sí" : "No") : "—",
+        fecha: operacion.fechaDisplay,
+        enlace_inscritos: "https://www.gdoaragon.es/organizador.html",
       })
       .then(() => ({ enviado: true }))
       .catch((err) => {
@@ -275,6 +285,8 @@ const EMAILJS_CONFIG = {
         horario: op.horario,
         operacion: op.nombre,
         ubicacion: `${op.ubicacion}, ${op.localidad}`,
+        punto_encuentro: op.puntoEncuentro || "",
+        que_llevar: (op.queLlevar || []).join(" · "),
         nombre: payload.nombre,
         apellidos: payload.apellidos,
         callsign: payload.callsign,
