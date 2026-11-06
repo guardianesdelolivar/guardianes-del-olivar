@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qugmbyqesdbxpbvytimd.supabase.co; connect-src 'self' https://qugmbyqesdbxpbvytimd.supabase.co wss://qugmbyqesdbxpbvytimd.supabase.co https://script.google.com https://script.googleusercontent.com https://api.emailjs.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<title>El campo · GUARDIANES DEL OLIVAR</title>
+<meta name="description" content="Campo de airsoft de Guardianes del Olivar en Estercuel (Teruel) en 3D: unas 3,7 hectáreas de terreno real, con zonas, casetas y aparcamiento." />
+<link rel="canonical" href="https://www.gdoaragon.es/campo.html" />
+<link rel="icon" href="assets/logo-180.png" type="image/png" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="es_ES" />
+<meta property="og:site_name" content="Guardianes del Olivar" />
+<meta property="og:title" content="El campo · GUARDIANES DEL OLIVAR" />
+<meta property="og:description" content="Campo de airsoft de Guardianes del Olivar en Estercuel (Teruel) en 3D: unas 3,7 hectáreas de terreno real, con zonas, casetas y aparcamiento." />
+<meta property="og:url" content="https://www.gdoaragon.es/campo.html" />
+<meta property="og:image" content="https://www.gdoaragon.es/assets/foto%201.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/styles.css?v=20261106b" />
+<noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
+</head>
+<body>
+<a class="skip-link" href="#main">Saltar al contenido</a>
+
+<header class="navbar">
+  <div class="navbar__inner">
+    <a class="brand" href="index.html">
+      <span class="brand__mark"><img src="assets/logo.webp" alt="Guardianes del Olivar" width="44" height="44" /></span>
+      <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
+    </a>
+    <nav aria-label="Navegación principal">
+      <ul class="nav-links" data-nav-links>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="calendario.html">Calendario</a></li>
+        <li><a href="como-funciona.html">Cómo funciona</a></li>
+        <li><a href="normas.html">Normas</a></li>
+        <li><a href="campo.html">El campo</a></li>
+        <li><a href="galeria.html">Galería</a></li>
+        <li><a href="nosotros.html">Nosotros</a></li>
+        <li><a href="contacto.html">Contacto</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a class="btn btn-primary" href="calendario.html">INSCRÍBETE</a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Abrir menú" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="page-header">
+    <div class="container">
+      <span class="eyebrow">Reconocimiento del terreno</span>
+      <h1 style="font-size:clamp(30px,5vw,48px);">EL CAMPO</h1>
+      <p class="lede" style="max-width:640px;margin-top:10px;">Estudia el terreno antes de la partida. Maqueta 3D del campo de Estercuel con el relieve y la foto aérea reales: gira, acércate y localiza cada zona.</p>
+    </div>
+  </div>
+
+  <section class="section section--tight">
+    <div class="container">
+      <div class="campo3d" data-campo3d>
+        <canvas class="campo3d__lienzo" data-campo3d-lienzo aria-label="Maqueta 3D del campo de airsoft de Estercuel"></canvas>
+        <div class="campo3d__etiquetas" data-campo3d-etiquetas aria-hidden="true"></div>
+        <div class="campo3d__cargando" data-campo3d-cargando>CARGANDO TERRENO…</div>
+
+        <div class="campo3d__hud campo3d__hud--arriba">
+          <span class="hud-chip"><span class="dot"></span>SECTOR: ESTERCUEL · TERUEL</span>
+          <span class="hud-chip">3,7 HA</span>
+        </div>
+        <div class="campo3d__controles">
+          <button type="button" class="btn btn-outline" data-vista="3d">VISTA 3D</button>
+          <button type="button" class="btn btn-outline" data-vista="aerea">AÉREA</button>
+          <button type="button" class="btn btn-outline" data-vista="baja">A RAS DE SUELO</button>
+          <button type="button" class="btn btn-outline" data-relieve>RELIEVE ×1,5</button>
+          <button type="button" class="btn btn-outline" data-girar aria-pressed="true">PARAR GIRO</button>
+          <button type="button" class="btn btn-outline" data-pantalla>PANTALLA COMPLETA</button>
+        </div>
+        <div class="campo3d__brujula" aria-hidden="true"><div data-campo3d-brujula><span>N</span></div></div>
+        <div class="campo3d__lectura" data-campo3d-lectura>ARRASTRA PARA GIRAR · RUEDA O PELLIZCO PARA ACERCAR</div>
+      </div>
+      <p class="campo3d__credito">Relieve (MDT05) y fotografía aérea (PNOA) © Instituto Geográfico Nacional, CC BY 4.0. Relieve exagerado ×1,5 por defecto para apreciar mejor las pendientes.</p>
+    </div>
+  </section>
+
+  <section class="stat-strip">
+    <div class="stat-strip__item"><div class="stat-strip__label">Superficie</div><div class="stat-strip__value accent">3,7 ha</div></div>
+    <div class="stat-strip__item"><div class="stat-strip__label">Perímetro</div><div class="stat-strip__value">781 m</div></div>
+    <div class="stat-strip__item"><div class="stat-strip__label">Desnivel</div><div class="stat-strip__value">39 m</div></div>
+    <div class="stat-strip__item"><div class="stat-strip__label">Altitud</div><div class="stat-strip__value">823–862 m</div></div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Puntos clave</span>
+        <h2>Zonas del campo</h2>
+      </div>
+      <div class="rules-grid">
+        <div class="rule-card reveal"><h3>Banderas</h3><ul><li>Dos puntos de bandera: uno en el oeste del campo y otro en el noreste.</li><li>Marcados en rojo en la maqueta.</li></ul></div>
+        <div class="rule-card reveal"><h3>Casetas</h3><ul><li>Tres casetas en la zona central-norte, entre los pinos.</li><li>Marcadas en caqui en la maqueta.</li></ul></div>
+        <div class="rule-card reveal"><h3>Aparcamiento</h3><ul><li>Al sureste, junto a la entrada desde la carretera TE-13.</li><li>Zona segura: fuera de juego.</li></ul></div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:32px;">
+        <a class="btn btn-primary" href="https://maps.app.goo.gl/tWSZByowQHgVgcqg8" target="_blank" rel="noopener">CÓMO LLEGAR</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <div>
+        <div class="brand" style="margin-bottom:14px;">
+          <span class="brand__mark"><img src="assets/logo.webp" alt="Guardianes del Olivar" width="44" height="44" /></span>
+          <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
+        </div>
+        <p style="max-width:320px;font-size:13.5px;">Organización dedicada a crear operaciones de airsoft inmersivas basadas en estrategia, adrenalina y compañerismo.</p>
+      </div>
+      <div>
+        <h4>NAVEGACIÓN</h4>
+        <ul>
+          <li><a href="operaciones.html">Operaciones</a></li>
+          <li><a href="calendario.html">Calendario</a></li>
+          <li><a href="normas.html">Normas</a></li>
+          <li><a href="galeria.html">Galería</a></li>
+          <li><a href="contacto.html">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>REDES Y CONTACTO</h4>
+        <ul>
+          <li><a href="https://www.instagram.com/airsoft_44500/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://chat.whatsapp.com/GrqcKiI6yVfJM8sWlZNhqt?s=cl&p=a&mlu=4&ilr=4" target="_blank" rel="noopener">WhatsApp</a></li>
+          <li><a href="mailto:guardianesdelolivar@gmail.com">guardianesdelolivar@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© <span data-year></span> GUARDIANES DEL OLIVAR. Todos los derechos reservados.</span>
+      <div class="footer__legal">
+        <a href="aviso-legal.html">Aviso legal</a>
+        <a href="privacidad.html">Política de privacidad</a>
+        <a href="cookies.html">Política de cookies</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/data/operaciones.js?v=20261106c"></script>
+<script src="assets/vendor/supabase-2.118.0.js?v=20261106c"></script>
+<script src="assets/js/auth.js?v=20261106c"></script>
+<script src="assets/js/main.js?v=20261106c"></script>
+<script type="module" src="assets/js/campo3d.js?v=20261106c"></script>
+</body>
+</html>
