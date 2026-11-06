@@ -17,8 +17,7 @@
   function tileHTML(foto, indiceGlobal, anio, operacion) {
     return `
       <button type="button" class="gallery-item reveal" data-gallery-tile="${indiceGlobal}" aria-label="Ampliar foto: ${foto.alt}">
-        <img class="gallery-item__img" src="${foto.src}" alt="${foto.alt}" loading="lazy" decoding="async"
-          onerror="this.closest('.gallery-item').classList.add('is-error'); this.remove();" />
+        <img class="gallery-item__img" src="${foto.src}" alt="${foto.alt}" loading="lazy" decoding="async" />
         <div class="gallery-item__overlay">
           <span class="gallery-item__tag">${anio}</span>
           <span class="gallery-item__title">${operacion}</span>
@@ -114,6 +113,14 @@
     }
 
     root.innerHTML = bloques.join("");
+    // Si una foto no carga, se muestra un aviso en vez del icono roto.
+    root.querySelectorAll(".gallery-item__img").forEach((img) => {
+      img.addEventListener("error", () => {
+        const tile = img.closest(".gallery-item");
+        if (tile) tile.classList.add("is-error");
+        img.remove();
+      }, { once: true });
+    });
     if (window.reScanReveal) window.reScanReveal();
   });
 })();

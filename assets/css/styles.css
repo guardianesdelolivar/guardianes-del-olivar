@@ -664,7 +664,7 @@ body { padding-top: var(--header-h); }
 .auth-gate p { max-width: 440px; font-size: 14px; }
 .auth-gate__actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 6px; }
 .auth-gate--nota { display: block; text-align: left; padding: 14px 16px; margin-bottom: 18px; font-size: 13.5px; color: var(--c-off-white); background: rgba(111,154,90,0.1); border: var(--border-olive); border-radius: var(--radius); }
-.auth-gate--nota[hidden], [data-inscripcion-form][hidden] { display: none; }
+.auth-gate--nota[hidden], [data-inscripcion-form][hidden], [data-comentario-form][hidden] { display: none; }
 .form-success { display: none; text-align: center; padding: 50px 20px; }
 .form-success.is-visible { display: block; }
 .form-success .icon { font-size: 40px; margin-bottom: 16px; }

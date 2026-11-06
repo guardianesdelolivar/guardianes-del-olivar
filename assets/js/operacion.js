@@ -235,6 +235,28 @@
       window.listarComentarios(op.id).then(renderComentarios);
     }
 
+    // Solo se puede comentar con la sesión iniciada: así se evita spam anónimo.
+    if (comentarioForm) {
+      comentarioForm.hidden = true;
+      const avisoComentario = document.createElement("p");
+      avisoComentario.className = "form-note";
+      avisoComentario.innerHTML = `Para comentar, <a href="login.html" style="color:var(--c-green-bright);">inicia sesión o crea tu cuenta</a>.`;
+      comentarioForm.insertAdjacentElement("beforebegin", avisoComentario);
+      const sesion = window.obtenerUsuarioActual ? window.obtenerUsuarioActual() : Promise.resolve(null);
+      sesion.then((user) => {
+        if (!user) return;
+        avisoComentario.remove();
+        comentarioForm.hidden = false;
+        if (window.obtenerPerfil) {
+          window.obtenerPerfil(user.id).then((perfil) => {
+            const nombreInput = comentarioForm.querySelector('[name="nombre"]');
+            const alias = perfil && (perfil.callsign || perfil.username);
+            if (nombreInput && !nombreInput.value && alias) nombreInput.value = alias;
+          });
+        }
+      });
+    }
+
     if (comentarioForm && window.enviarComentario) {
       comentarioForm.addEventListener("submit", (e) => {
         e.preventDefault();

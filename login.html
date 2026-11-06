@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qugmbyqesdbxpbvytimd.supabase.co; connect-src 'self' https://qugmbyqesdbxpbvytimd.supabase.co wss://qugmbyqesdbxpbvytimd.supabase.co https://script.google.com https://script.googleusercontent.com https://api.emailjs.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
 <title>Mi cuenta · GUARDIANES DEL OLIVAR</title>
 <meta name="description" content="Inicia sesión o regístrate en GUARDIANES DEL OLIVAR para que tus datos se rellenen automáticamente al inscribirte en las operaciones." />
 <meta name="robots" content="noindex,follow" />
@@ -218,7 +220,7 @@
   </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="assets/vendor/supabase-2.118.0.js"></script>
 <script src="assets/js/data/operaciones.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/main.js"></script>
