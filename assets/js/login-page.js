@@ -258,6 +258,15 @@
         if (registroMsg) { registroMsg.textContent = "Creando cuenta…"; registroMsg.style.color = ""; }
         window.registrarUsuario(email, password, username).then((res) => {
           if (res.ok) {
+            // Si la cuenta queda activa al momento (sin email de confirmación),
+            // se entra directamente.
+            if (res.data && res.data.session) {
+              if (registroMsg) { registroMsg.textContent = "¡Cuenta creada! Entrando…"; registroMsg.style.color = "var(--c-green-bright)"; }
+              registroForm.reset();
+              if (irADestino()) return;
+              window.obtenerUsuarioActual().then(mostrarEstado);
+              return;
+            }
             if (registroMsg) {
               registroMsg.textContent = volver
                 ? "¡Cuenta creada! Revisa tu email para confirmarla, luego inicia sesión aquí y te llevamos directo a la inscripción."
