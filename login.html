@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mi cuenta · GUARDIANES DEL OLIVAR</title>
 <meta name="description" content="Inicia sesión o regístrate en GUARDIANES DEL OLIVAR para que tus datos se rellenen automáticamente al inscribirte en las operaciones." />
+<meta name="robots" content="noindex,follow" />
+<link rel="icon" href="assets/logo-180.png" type="image/png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/css/styles.css" />
+<noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
 </head>
 <body>
 <a class="skip-link" href="#main">Saltar al contenido</a>
@@ -15,7 +18,7 @@
 <header class="navbar">
   <div class="navbar__inner">
     <a class="brand" href="index.html">
-      <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+      <span class="brand__mark"><img src="assets/logo.webp" alt="Guardianes del Olivar" width="44" height="44" /></span>
       <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
     </a>
     <nav aria-label="Navegación principal">
@@ -52,6 +55,7 @@
 
       <!-- ESTADO: NO HA INICIADO SESIÓN -->
       <div data-auth-guest>
+        <p class="auth-gate auth-gate--nota" data-volver-aviso hidden>Inicia sesión o crea tu cuenta para completar tu inscripción. Al entrar volverás directamente al formulario.</p>
         <div class="form-card">
           <div style="display:flex;gap:10px;margin-bottom:22px;">
             <button type="button" class="btn btn-primary" data-tab-btn="login" style="flex:1;">INICIAR SESIÓN</button>
@@ -61,12 +65,12 @@
           <form data-login-form novalidate>
             <div class="field">
               <label for="login-email">Email *</label>
-              <input type="email" id="login-email" name="email" required />
+              <input type="email" id="login-email" name="email" autocomplete="email" inputmode="email" required />
               <span class="field__error">Introduce un email válido.</span>
             </div>
             <div class="field" style="margin-top:14px;">
               <label for="login-password">Contraseña *</label>
-              <input type="password" id="login-password" name="password" required />
+              <input type="password" id="login-password" name="password" autocomplete="current-password" required />
               <span class="field__error">Introduce tu contraseña.</span>
             </div>
             <p data-login-msg style="font-size:13px;margin-top:14px;min-height:18px;"></p>
@@ -78,22 +82,22 @@
           <form data-registro-form novalidate style="display:none;">
             <div class="field">
               <label for="reg-username">Usuario *</label>
-              <input type="text" id="reg-username" name="username" required minlength="3" />
+              <input type="text" id="reg-username" name="username" autocomplete="username" required minlength="3" />
               <span class="field__error">Elige un nombre de usuario (mínimo 3 caracteres).</span>
             </div>
             <div class="field" style="margin-top:14px;">
               <label for="reg-email">Email *</label>
-              <input type="email" id="reg-email" name="email" required />
+              <input type="email" id="reg-email" name="email" autocomplete="email" inputmode="email" required />
               <span class="field__error">Introduce un email válido.</span>
             </div>
             <div class="field" style="margin-top:14px;">
               <label for="reg-password">Contraseña *</label>
-              <input type="password" id="reg-password" name="password" required minlength="6" />
+              <input type="password" id="reg-password" name="password" autocomplete="new-password" required minlength="6" />
               <span class="field__error">Al menos 6 caracteres.</span>
             </div>
             <div class="field" style="margin-top:14px;">
               <label for="reg-password2">Repite la contraseña *</label>
-              <input type="password" id="reg-password2" name="password2" required />
+              <input type="password" id="reg-password2" name="password2" autocomplete="new-password" required />
               <span class="field__error">Las contraseñas no coinciden.</span>
             </div>
             <p data-registro-msg style="font-size:13px;margin-top:14px;min-height:18px;"></p>
@@ -115,38 +119,39 @@
               <img data-avatar-preview src="" alt="Foto de perfil" style="width:72px;height:72px;border-radius:50%;object-fit:cover;background:var(--c-black-soft);border:var(--border-hairline);display:none;" />
               <div style="flex:1;">
                 <label for="p-avatar">Foto de perfil (opcional)</label>
-                <input type="file" id="p-avatar" name="avatar" accept="image/*" />
+                <input type="file" id="p-avatar" name="avatar" accept="image/*" style="display:none;" />
+                <button type="button" class="btn btn-outline" data-avatar-trigger>SUBIR FOTO</button>
                 <span class="field__error">La imagen no puede pesar más de 3 MB.</span>
               </div>
             </div>
             <div class="form-grid cols-2">
               <div class="field">
                 <label for="p-username">Usuario</label>
-                <input type="text" id="p-username" name="username" />
+                <input type="text" id="p-username" name="username" autocomplete="username" />
               </div>
               <div class="field">
                 <label for="p-nombre">Nombre</label>
-                <input type="text" id="p-nombre" name="nombre" />
+                <input type="text" id="p-nombre" name="nombre" autocomplete="given-name" />
               </div>
               <div class="field">
                 <label for="p-apellidos">Apellidos</label>
-                <input type="text" id="p-apellidos" name="apellidos" />
+                <input type="text" id="p-apellidos" name="apellidos" autocomplete="family-name" />
               </div>
               <div class="field">
                 <label for="p-dni">DNI / NIE</label>
-                <input type="text" id="p-dni" name="dni" placeholder="12345678A" />
+                <input type="text" id="p-dni" name="dni" placeholder="12345678A" autocomplete="off" autocapitalize="characters" />
               </div>
               <div class="field">
                 <label for="p-telefono">Teléfono</label>
-                <input type="tel" id="p-telefono" name="telefono" placeholder="600 000 000" />
+                <input type="tel" id="p-telefono" name="telefono" placeholder="600 000 000" autocomplete="tel" inputmode="tel" />
               </div>
               <div class="field">
                 <label for="p-callsign">Callsign</label>
-                <input type="text" id="p-callsign" name="callsign" />
+                <input type="text" id="p-callsign" name="callsign" autocomplete="nickname" />
               </div>
               <div class="field">
                 <label for="p-equipo">Equipo (opcional)</label>
-                <input type="text" id="p-equipo" name="equipo" />
+                <input type="text" id="p-equipo" name="equipo" autocomplete="off" />
               </div>
               <div class="field">
                 <label for="p-experiencia">Experiencia</label>
@@ -178,7 +183,7 @@
     <div class="footer__top">
       <div>
         <div class="brand" style="margin-bottom:14px;">
-          <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+          <span class="brand__mark"><img src="assets/logo.webp" alt="Guardianes del Olivar" width="44" height="44" /></span>
           <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
         </div>
         <p style="max-width:320px;font-size:13.5px;">Organización dedicada a crear operaciones de airsoft inmersivas basadas en estrategia, adrenalina y compañerismo.</p>

@@ -19,12 +19,15 @@
     if (!proxima) {
       if (titleEl) titleEl.textContent = "No hay operaciones programadas todavía";
       wrap.style.display = "none";
+      const cta = document.querySelector("[data-countdown-cta]");
+      if (cta) cta.textContent = "VER OPERACIONES ANTERIORES";
       return;
     }
 
     if (titleEl) titleEl.textContent = proxima.nombre;
 
-    const target = new Date(`${proxima.fecha}T${proxima.horaInicio}:00`);
+    // Hora de inicio en hora de España, sea cual sea la zona del visitante.
+    const target = fechaHoraMadrid(proxima.fecha, proxima.horaInicio);
     const dEl = document.querySelector("[data-cd-days]");
     const hEl = document.querySelector("[data-cd-hours]");
     const mEl = document.querySelector("[data-cd-mins]");

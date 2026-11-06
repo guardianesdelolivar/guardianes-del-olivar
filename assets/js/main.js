@@ -86,20 +86,6 @@
   }
   window.reScanReveal = reScanReveal;
 
-  function initOperatorsOnline() {
-    const el = document.querySelector("[data-operators-online]");
-    if (!el) return;
-    // Cifra decorativa estable por sesión, con ligera variación para dar sensación de "en vivo".
-    const base = 214;
-    el.textContent = String(base);
-    setInterval(() => {
-      const delta = Math.random() > 0.5 ? 1 : -1;
-      const current = parseInt(el.textContent, 10) || base;
-      const next = Math.min(260, Math.max(190, current + delta));
-      el.textContent = String(next);
-    }, 4000);
-  }
-
   // Aviso de cookies — se muestra una vez por navegador hasta que se acepta.
   function initCookieBanner() {
     if (localStorage.getItem("gdo_cookies_aceptadas") === "1") return;
@@ -121,7 +107,6 @@
     initClock();
     initFooterYear();
     reScanReveal();
-    initOperatorsOnline();
     initCookieBanner();
   });
 })();

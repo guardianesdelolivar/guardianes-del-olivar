@@ -7,9 +7,63 @@
  * confirmación) leen de aquí.
  *
  * status: "abiertas" | "ultimas" | "completo" | "finalizado"
+ *
+ * Campos opcionales:
+ *   plazasTotal / maxParticipantes: null  -> partida sin límite de plazas
+ *                                           (no se muestra barra de plazas).
+ *   contadorEnVivo: true  -> esta operación usa el contador de plazas de la
+ *                            hoja de Google. El contador es UNO solo para toda
+ *                            la hoja, así que solo una operación debe tenerlo.
+ *   almuerzo: false       -> oculta la opción de almuerzo (+10 €) al inscribirse.
+ *   duracionHoras         -> duración para el archivo de calendario (.ics).
  */
 
 const OPERACIONES = [
+  {
+    id: "partida-24h-noviembre",
+    codigo: "OP-2611-24H",
+    nombre: "PARTIDA DE 24 HORAS",
+    tipo: "Partida 24 horas",
+    clasificacion: "PUBLIC",
+    fecha: "2026-11-14",
+    fechaDisplay: "14 NOVIEMBRE 2026",
+    horaInicio: "08:00",
+    horaFin: null,
+    duracionHoras: 24,
+    horario: "Empezamos a las 08:00 h en el campo · Partida de 24 horas · También puedes venir solo de día y jugar hasta que te canses",
+    ubicacion: "Campo de Airsoft de Estercuel",
+    localidad: "Estercuel (Teruel)",
+    mapaUbicacion: "https://maps.app.goo.gl/tWSZByowQHgVgcqg8",
+    puntoEncuentro: "En el propio campo de Guardianes del Olivar, a las 08:00 h",
+    mapaPuntoEncuentro: "https://maps.app.goo.gl/tWSZByowQHgVgcqg8",
+    pago: "El pago (15 €) se hace en efectivo, en el campo, una vez rellenes la documentación el mismo día.",
+    precio: 15,
+    plazasTotal: 30,
+    plazasOcupadas: 0,
+    maxParticipantes: 30,
+    almuerzo: false,
+    status: "abiertas",
+    dificultad: "Todos los niveles",
+    facciones: [],
+    objetivos: [
+      { icono: "🕒", texto: "24 horas de partida, de día y de noche" },
+      { icono: "⛺", texto: "Noche en el campo, en carpa y saco (opcional)" }
+    ],
+    resumen: "Partida de 24 horas en el campo de Guardianes del Olivar. Se hace noche en el campo, y si no quieres dormir allí, juega desde por la mañana hasta que te canses.",
+    historia: "Sábado 14 de noviembre de 2026. Por primera vez, Guardianes del Olivar organiza una partida de 24 horas en el Campo de Airsoft de Estercuel (Teruel). Se juega de día y de noche, con la carpa montada en el campo para quien quiera quedarse a dormir.",
+    briefing: "Empezamos a las 08:00 h en el propio campo. La partida dura 24 horas, pero no hace falta aguantarlas todas: puedes venir desde por la mañana y jugar hasta que te canses. Para quien quiera hacer noche, montamos una carpa donde dormir en saco de dormir. No hay servicio de comida: cada uno trae la suya y el agua para toda la jornada. El pago (15 €) se hace en efectivo en el propio campo, al rellenar la documentación. Los modos de juego se explican en el briefing del día.",
+    misiones: [
+      { numero: "01", titulo: "Llegada al campo", detalle: "08:00 h en el Campo de Guardianes del Olivar. Documentación, pago y revisión de réplicas antes de empezar." },
+      { numero: "02", titulo: "Jornada de día", detalle: "Partida desde por la mañana. Si no vas a dormir allí, juega hasta que te canses." },
+      { numero: "03", titulo: "Noche en el campo", detalle: "Se sigue jugando de noche. Quien quiera, descansa en la carpa con su saco de dormir." },
+      { numero: "04", titulo: "Modos de juego", detalle: "Se anuncian en el briefing del día." }
+    ],
+    queLlevar: ["Réplica revisada", "Protección ocular homologada (obligatoria)", "Tu comida y agua: no hay servicio de comidas", "Saco de dormir, si vas a hacer noche en la carpa", "Ropa de abrigo para la noche", "Linterna o frontal", "Calzado adecuado para terreno natural"],
+    reglasEspeciales: ["Plazas limitadas a 30 jugadores: confirma cuanto antes", "Cada jugador trae su propia comida", "Dormir en el campo es opcional: hay carpa para sacos de dormir", "El pago (15 €) se hace en efectivo, en el campo, al rellenar la documentación", "Inscripción también disponible por WhatsApp: 642 06 42 32 (Javi Cantos)"],
+    imagenTema: "nocturna",
+    imagenCartel: "assets/cartel-partida-24h.webp",
+    imagenCartelCompartir: "assets/cartel-partida-24h.jpg"
+  },
   {
     id: "la-guerra-comienza",
     codigo: "OP-2610-LGC",
@@ -51,14 +105,72 @@ const OPERACIONES = [
     queLlevar: ["Réplica revisada (pasa el cronógrafo de 08:30 a 09:00 h)", "Protección ocular homologada (obligatoria)", "Ropa de camuflaje o de tonos oscuros", "Agua y comida para toda la jornada: se juega hasta que el cuerpo aguante", "Calzado adecuado para terreno natural"],
     reglasEspeciales: ["Plazas limitadas a 40 jugadores: confirma cuanto antes", "El pago (10 €) se hace en efectivo, en el campo, al rellenar la documentación", "Inscripción también disponible por WhatsApp: 642 06 42 32 (Javi Cantos)"],
     maxParticipantes: 40,
+    contadorEnVivo: true,
     imagenTema: "urbano",
-    imagenCartel: "assets/foto%202.jpeg"
+    imagenCartel: "assets/cartel-la-guerra-comienza.webp",
+    imagenCartelCompartir: "assets/cartel-la-guerra-comienza.jpg"
   }
 ];
 
-// Utilidad compartida: devuelve solo operaciones futuras u ordenadas por fecha.
+/* ---------------------------------------------------------------
+ * HORA DE ESPAÑA (Europe/Madrid)
+ * Las fechas y horas de las operaciones son siempre hora peninsular
+ * española, aunque quien visite la web tenga el móvil en otra zona
+ * horaria. Estas utilidades lo garantizan, con horario de verano
+ * incluido.
+ * --------------------------------------------------------------- */
+const ZONA_HORARIA_OPERACIONES = "Europe/Madrid";
+
+// Diferencia en minutos entre Madrid y UTC en un instante dado (+60 o +120).
+function desfaseMadridMinutos(instante) {
+  const partes = new Intl.DateTimeFormat("en-US", {
+    timeZone: ZONA_HORARIA_OPERACIONES, hourCycle: "h23",
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit",
+  }).formatToParts(instante).reduce((acc, p) => { acc[p.type] = p.value; return acc; }, {});
+  const comoUTC = Date.UTC(+partes.year, +partes.month - 1, +partes.day, +partes.hour, +partes.minute, +partes.second);
+  return Math.round((comoUTC - instante.getTime()) / 60000);
+}
+
+// Convierte "2026-10-17" + "08:00" (hora de Madrid) en un Date correcto.
+function fechaHoraMadrid(fecha, hora) {
+  const [y, m, d] = fecha.split("-").map(Number);
+  const [hh, mm] = (hora || "00:00").split(":").map(Number);
+  const aproximado = new Date(Date.UTC(y, m - 1, d, hh, mm));
+  return new Date(aproximado.getTime() - desfaseMadridMinutos(aproximado) * 60000);
+}
+
+// Desfase en formato ISO ("+02:00" en verano, "+01:00" en invierno).
+function desfaseMadridISO(fecha, hora) {
+  const min = desfaseMadridMinutos(fechaHoraMadrid(fecha, hora));
+  const signo = min >= 0 ? "+" : "-";
+  const abs = Math.abs(min);
+  return `${signo}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
+}
+
+// Fecha de hoy en Madrid, como "AAAA-MM-DD".
+function hoyEnMadrid() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: ZONA_HORARIA_OPERACIONES }).format(new Date());
+}
+
+/* ---------------------------------------------------------------
+ * CIERRE AUTOMÁTICO DE OPERACIONES PASADAS
+ * Una operación cuya fecha ya ha pasado se marca como "finalizado"
+ * automáticamente, aunque aquí arriba siga poniendo "abiertas".
+ * Así nadie puede inscribirse a una partida que ya se jugó, y pasa
+ * sola al archivo de "Operaciones finalizadas". El día de la partida
+ * sigue apareciendo como activa; se cierra a partir del día siguiente.
+ * --------------------------------------------------------------- */
+(function cerrarOperacionesPasadas() {
+  const hoy = hoyEnMadrid();
+  OPERACIONES.forEach((op) => {
+    if (op.fecha < hoy && op.status !== "finalizado") op.status = "finalizado";
+  });
+})();
+
+// Utilidad compartida: devuelve las operaciones ordenadas por fecha.
 function ordenarOperacionesPorFecha(lista) {
-  return [...lista].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+  return [...lista].sort((a, b) => a.fecha.localeCompare(b.fecha));
 }
 
 function obtenerOperacionPorId(id) {

@@ -32,6 +32,71 @@
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute("content", op.resumen);
 
+    // SEO: la URL canónica y los metadatos Open Graph de esta página son
+    // dinámicos (dependen de ?op=), así que se ajustan aquí a la operación real.
+    const urlCanonica = `https://www.gdoaragon.es/operacion.html?op=${op.id}`;
+    const canonicalTag = document.querySelector("[data-canonical]");
+    if (canonicalTag) canonicalTag.setAttribute("href", urlCanonica);
+    const ogTitle = document.querySelector("[data-og-title]");
+    if (ogTitle) ogTitle.setAttribute("content", `${op.nombre} · GUARDIANES DEL OLIVAR`);
+    const ogDesc = document.querySelector("[data-og-description]");
+    if (ogDesc) ogDesc.setAttribute("content", op.resumen);
+    const ogUrl = document.querySelector("[data-og-url]");
+    if (ogUrl) ogUrl.setAttribute("content", urlCanonica);
+
+    // SEO: datos estructurados (JSON-LD) para esta operación, construidos
+    // solo con los campos reales ya presentes en OPERACIONES (sin inventar
+    // ningún dato: ni dirección exacta, ni valoraciones, ni asistentes).
+    (function inyectarJsonLd() {
+      try {
+        // Desfase real de Madrid ese día (+02:00 en verano, +01:00 en invierno).
+        const inicioISO = `${op.fecha}T${op.horaInicio || "00:00"}:00${desfaseMadridISO(op.fecha, op.horaInicio)}`;
+        const estadoSchema = "https://schema.org/EventScheduled";
+        const disponibilidad = (op.status === "abiertas" || op.status === "ultimas") ? "https://schema.org/InStock" : "https://schema.org/SoldOut";
+        const ld = {
+          "@context": "https://schema.org",
+          "@type": "Event",
+          "name": op.nombre,
+          "description": op.resumen,
+          "startDate": inicioISO,
+          "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+          "eventStatus": estadoSchema,
+          "location": {
+            "@type": "Place",
+            "name": op.ubicacion,
+            "address": {
+              "@type": "PostalAddress",
+              "addressLocality": op.localidad,
+              "addressCountry": "ES"
+            }
+          },
+          "image": [`https://www.gdoaragon.es/${op.imagenCartelCompartir || op.imagenCartel}`],
+          "organizer": {
+            "@type": "Organization",
+            "name": "Guardianes del Olivar",
+            "url": "https://www.gdoaragon.es/"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": String(op.precio),
+            "priceCurrency": "EUR",
+            "availability": disponibilidad,
+            "url": urlCanonica
+          }
+        };
+        let script = document.querySelector('script[type="application/ld+json"][data-op-jsonld]');
+        if (!script) {
+          script = document.createElement("script");
+          script.type = "application/ld+json";
+          script.setAttribute("data-op-jsonld", "");
+          document.head.appendChild(script);
+        }
+        script.textContent = JSON.stringify(ld);
+      } catch (err) {
+        console.error("No se pudieron generar los datos estructurados:", err);
+      }
+    })();
+
     document.querySelector("[data-op-clasificacion]").textContent = `CLASSIFICATION: ${op.clasificacion}`;
     const clasifTag = document.querySelector("[data-op-clasificacion]");
     if (op.clasificacion === "RESTRICTED") clasifTag.classList.add("tag--restricted");
@@ -44,6 +109,16 @@
     document.querySelector("[data-op-codigo]").textContent = `${op.codigo} · ${op.fechaDisplay} · ${op.ubicacion}, ${op.localidad}`;
 
     document.querySelector("[data-op-resumen]").textContent = op.resumen;
+
+    // Cartel de la operación dentro del propio dossier (antes solo salía en las tarjetas).
+    const cartelBlock = document.querySelector("[data-op-cartel-block]");
+    if (cartelBlock && op.imagenCartel) {
+      const img = cartelBlock.querySelector("[data-op-cartel]");
+      img.src = op.imagenCartel;
+      img.alt = `Cartel de ${op.nombre}`;
+      cartelBlock.querySelector("[data-op-cartel-link]").href = op.imagenCartelCompartir || op.imagenCartel;
+      cartelBlock.hidden = false;
+    }
     document.querySelector("[data-op-historia]").textContent = op.historia;
     document.querySelector("[data-op-briefing]").textContent = op.briefing;
 
@@ -82,8 +157,8 @@
     }
     document.querySelector("[data-op-precio]").innerHTML = `${op.precio} €` + (op.pago ? `<br><small style="color:var(--c-grey-dim);font-family:var(--ff-mono);font-size:11px;">${op.pago}</small>` : "");
     document.querySelector("[data-op-dificultad]").textContent = op.dificultad;
-    document.querySelector("[data-op-facciones]").textContent = op.facciones.join(" vs ");
-    document.querySelector("[data-op-max]").textContent = `${op.maxParticipantes} operadores`;
+    document.querySelector("[data-op-facciones]").textContent = op.facciones.length ? op.facciones.join(" vs ") : "Se reparten en el campo";
+    document.querySelector("[data-op-max]").textContent = op.maxParticipantes ? `${op.maxParticipantes} operadores` : "Sin límite";
 
     const checklist = document.querySelector("[data-op-checklist]");
     const checklistBlock = document.querySelector("[data-op-checklist-block]");
@@ -176,6 +251,73 @@
             window.listarComentarios(op.id).then(renderComentarios);
           }
         });
+      });
+    }
+
+    // --- Compartir, copiar enlace y añadir a calendario ---
+    const feedback = document.querySelector("[data-share-feedback]");
+    function mostrarFeedback(msg) {
+      if (!feedback) return;
+      feedback.textContent = msg;
+      setTimeout(() => { if (feedback.textContent === msg) feedback.textContent = ""; }, 4000);
+    }
+
+    const shareWhatsapp = document.querySelector("[data-share-whatsapp]");
+    if (shareWhatsapp) {
+      shareWhatsapp.addEventListener("click", () => {
+        const texto = `${op.nombre} — ${op.fechaDisplay}, ${op.ubicacion} (${op.localidad}). Más info: ${urlCanonica}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank", "noopener");
+      });
+    }
+
+    const shareCopy = document.querySelector("[data-share-copy]");
+    if (shareCopy) {
+      shareCopy.addEventListener("click", () => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(urlCanonica)
+            .then(() => mostrarFeedback("Enlace copiado al portapapeles."))
+            .catch(() => mostrarFeedback("No se pudo copiar el enlace. Cópialo manualmente: " + urlCanonica));
+        } else {
+          mostrarFeedback("Copia este enlace manualmente: " + urlCanonica);
+        }
+      });
+    }
+
+    const shareIcs = document.querySelector("[data-share-ics]");
+    if (shareIcs) {
+      shareIcs.addEventListener("click", () => {
+        try {
+          const inicio = fechaHoraMadrid(op.fecha, op.horaInicio);
+          const fin = op.horaFin ? fechaHoraMadrid(op.fecha, op.horaFin) : new Date(inicio.getTime() + (op.duracionHoras || 4) * 3600000);
+          const formatoICS = (d) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+          const lugar = `${op.ubicacion}, ${op.localidad}`;
+          const ics = [
+            "BEGIN:VCALENDAR",
+            "VERSION:2.0",
+            "PRODID:-//Guardianes del Olivar//ES",
+            "BEGIN:VEVENT",
+            `UID:${op.id}@gdoaragon.es`,
+            `DTSTAMP:${formatoICS(new Date())}`,
+            `DTSTART:${formatoICS(inicio)}`,
+            `DTEND:${formatoICS(fin)}`,
+            `SUMMARY:${op.nombre}`,
+            `DESCRIPTION:${(op.resumen || "").replace(/\n/g, " ")} Más info: ${urlCanonica}`,
+            `LOCATION:${lugar}`,
+            "END:VEVENT",
+            "END:VCALENDAR",
+          ].join("\r\n");
+          const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+          const enlace = document.createElement("a");
+          enlace.href = URL.createObjectURL(blob);
+          enlace.download = `${op.id}.ics`;
+          document.body.appendChild(enlace);
+          enlace.click();
+          document.body.removeChild(enlace);
+          mostrarFeedback("Archivo de calendario descargado.");
+        } catch (err) {
+          console.error("No se pudo generar el archivo de calendario:", err);
+          mostrarFeedback("No se pudo generar el archivo de calendario.");
+        }
       });
     }
   });

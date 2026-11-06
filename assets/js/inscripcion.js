@@ -48,19 +48,9 @@ const EMAILJS_CONFIG = {
 
   function enviarBriefingPorEmail(payload, operacion) {
     if (!emailjsListo) {
-      console.info(
-        "[EmailJS no configurado] El briefing se habría enviado con estos datos:",
-        {
-          to_email: payload.email,
-          to_name: payload.nombre,
-          operacion_nombre: operacion.nombre,
-          fecha: operacion.fechaDisplay,
-          horario: operacion.horario,
-          ubicacion: `${operacion.ubicacion}, ${operacion.localidad}`,
-          precio: `${payload.precioFinal} €`,
-          almuerzo: payload.quiereAlmuerzo ? payload.almuerzo : "No almuerza",
-        }
-      );
+      // PRIVACIDAD: no se registra el email ni el nombre del inscrito en
+      // consola, solo un aviso genérico de que el envío no está configurado.
+      console.info("[EmailJS no configurado] No se ha enviado el briefing automático para esta inscripción.");
       return Promise.resolve({ enviado: false, motivo: "EmailJS no configurado" });
     }
     return window.emailjs
@@ -89,7 +79,8 @@ const EMAILJS_CONFIG = {
       EMAILJS_CONFIG.templateIdOrganizador !== "TU_TEMPLATE_ID_ORGANIZADOR";
 
     if (!organizadorListo) {
-      console.info("[Notificación al organizador no configurada] Datos del inscrito:", payload);
+      // PRIVACIDAD: no se vuelcan los datos del inscrito a la consola.
+      console.info("[Notificación al organizador no configurada] No se ha enviado el aviso por email para esta inscripción.");
       return Promise.resolve({ enviado: false });
     }
     return window.emailjs
@@ -203,15 +194,39 @@ const EMAILJS_CONFIG = {
 
     if (!form) return;
 
-    // Si hay sesión iniciada (Supabase), rellenamos el formulario con el
-    // perfil guardado del operador, para no tener que escribirlo cada vez.
+    // CUENTA OBLIGATORIA: solo se puede inscribir quien ha iniciado sesión.
+    // Así cada cuenta se apunta una sola vez a cada operación (lo garantiza
+    // también la base de datos con una restricción única) y sus datos se
+    // rellenan solos desde su perfil.
     let usuarioActual = null;
-    if (window.obtenerUsuarioActual && window.obtenerPerfil) {
-      window.obtenerUsuarioActual().then((user) => {
-        if (!user) return;
-        usuarioActual = user;
-        const emailField = form.querySelector('[name="email"]');
-        if (emailField && !emailField.value) emailField.value = user.email;
+    const volverAqui = `inscripcion.html?op=${encodeURIComponent(op.id)}`;
+    const avisoSesion = document.createElement("div");
+    avisoSesion.className = "empty-state";
+    avisoSesion.textContent = "Comprobando tu sesión…";
+    form.hidden = true;
+    form.insertAdjacentElement("beforebegin", avisoSesion);
+
+    function mostrarAccesoObligatorio() {
+      avisoSesion.className = "auth-gate";
+      avisoSesion.innerHTML = `
+        <h3>Necesitas una cuenta para inscribirte</h3>
+        <p>Crea tu cuenta (o entra si ya tienes una) y vuelves aquí directamente. Tus datos se guardan en tu perfil, así la próxima vez el formulario se rellena solo.</p>
+        <div class="auth-gate__actions">
+          <a class="btn btn-primary" href="login.html?modo=registro&volver=${encodeURIComponent(volverAqui)}">CREAR CUENTA</a>
+          <a class="btn btn-outline" href="login.html?volver=${encodeURIComponent(volverAqui)}">YA TENGO CUENTA</a>
+        </div>`;
+    }
+
+    const comprobarSesion = window.obtenerUsuarioActual ? window.obtenerUsuarioActual() : Promise.resolve(null);
+    comprobarSesion.then((user) => {
+      if (!user) { mostrarAccesoObligatorio(); return; }
+      usuarioActual = user;
+      avisoSesion.remove();
+      form.hidden = false;
+
+      const emailField = form.querySelector('[name="email"]');
+      if (emailField && !emailField.value) emailField.value = user.email;
+      if (window.obtenerPerfil) {
         window.obtenerPerfil(user.id).then((perfil) => {
           if (!perfil) return;
           ["nombre", "apellidos", "dni", "telefono", "callsign", "equipo"].forEach((campo) => {
@@ -221,7 +236,46 @@ const EMAILJS_CONFIG = {
           const expSelect = form.querySelector('[name="experiencia"]');
           if (expSelect && !expSelect.value && perfil.experiencia) expSelect.value = perfil.experiencia;
         });
-      });
+      }
+
+      // Evita que una misma cuenta se inscriba dos veces en la misma operación.
+      if (window.supabaseClient) {
+        window.supabaseClient
+          .from("inscripciones_registro")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("operacion_id", op.id)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data) bloquearPorDuplicado();
+          });
+      }
+    });
+
+    function bloquearPorDuplicado() {
+      form.querySelectorAll("input, select, textarea, button").forEach((el) => (el.disabled = true));
+      if (form.nextElementSibling && form.nextElementSibling.hasAttribute("data-aviso-duplicado")) return;
+      const aviso = document.createElement("div");
+      aviso.className = "empty-state";
+      aviso.setAttribute("data-aviso-duplicado", "");
+      aviso.style.marginTop = "18px";
+      aviso.textContent = "Ya estás inscrito en esta operación con esta cuenta. Si crees que es un error, contacta con la organización.";
+      form.insertAdjacentElement("afterend", aviso);
+    }
+
+    // Guarda la inscripción en la base de datos ANTES de dar la plaza por
+    // confirmada. Si la cuenta ya estaba inscrita, la base de datos lo rechaza.
+    function reservarPlaza() {
+      if (!usuarioActual || !window.supabaseClient) return Promise.resolve("sin-sesion");
+      return window.supabaseClient
+        .from("inscripciones_registro")
+        .insert({ user_id: usuarioActual.id, operacion_id: op.id })
+        .then(({ error }) => {
+          if (!error) return "ok";
+          if (error.code === "23505") return "duplicada";
+          console.error("No se pudo guardar la inscripción en la base de datos:", error.message);
+          return "error";
+        });
     }
 
     function setFieldError(field, message) {
@@ -251,7 +305,12 @@ const EMAILJS_CONFIG = {
       field.addEventListener("blur", () => validateField(field));
     });
 
-    // Almuerzo opcional (+10 €)
+    // Almuerzo opcional (+10 €). Se oculta en operaciones donde cada
+    // jugador trae su comida (almuerzo: false en operaciones.js).
+    if (op.almuerzo === false) {
+      const bloqueAlmuerzo = form.querySelector(".field-check-block");
+      if (bloqueAlmuerzo) bloqueAlmuerzo.remove();
+    }
     const almuerzoToggle = form.querySelector("[data-almuerzo-toggle]");
     const almuerzoDetalle = form.querySelector("[data-almuerzo-detalle]");
     const almuerzoSelect = form.querySelector("#almuerzo");
@@ -284,7 +343,9 @@ const EMAILJS_CONFIG = {
     function procesarInscripcion(payload) {
       // Punto de integración futuro: Stripe Checkout Session / PayPal Orders API.
       // De momento solo generamos un identificador visual de confirmación.
-      console.info("Inscripción registrada (demo, sin pago real):", payload);
+      // PRIVACIDAD: no se vuelca el payload completo (DNI, teléfono, email...)
+      // a la consola del navegador; solo un registro mínimo sin datos personales.
+      console.info("Inscripción registrada (demo, sin pago real) para la operación:", payload.operacionId);
       return { ok: true, referencia: `GDO-${payload.operacionId.toUpperCase()}-${Date.now().toString().slice(-5)}` };
     }
 
@@ -295,10 +356,11 @@ const EMAILJS_CONFIG = {
         if (!validateField(field)) valid = false;
       });
 
+      // El consentimiento de fotos (acepta_fotos) es opcional a propósito:
+      // no debe condicionar la inscripción. Solo normas y riesgos son obligatorios.
       const normas = form.querySelector('[name="acepta_normas"]');
       const riesgos = form.querySelector('[name="acepta_riesgos"]');
-      const fotos = form.querySelector('[name="acepta_fotos"]');
-      [normas, riesgos, fotos].forEach((cb) => {
+      [normas, riesgos].forEach((cb) => {
         const wrap = cb.closest(".field-check");
         if (!cb.checked) {
           valid = false;
@@ -348,8 +410,24 @@ const EMAILJS_CONFIG = {
         precioFinal: precioFinal,
       };
 
-      const resultado = procesarInscripcion(payload);
-      if (resultado.ok) {
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const errorEnvio = form.querySelector("[data-error-envio]");
+      if (errorEnvio) errorEnvio.textContent = "";
+      if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "CONFIRMANDO…"; }
+
+      reservarPlaza().then((reserva) => {
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "CONFIRMAR INSCRIPCIÓN"; }
+        if (reserva === "sin-sesion") {
+          if (errorEnvio) errorEnvio.textContent = "Tu sesión ha caducado. Vuelve a iniciar sesión para inscribirte.";
+          return;
+        }
+        if (reserva === "duplicada") {
+          bloquearPorDuplicado();
+          return;
+        }
+
+        const resultado = procesarInscripcion(payload);
+        if (!resultado.ok) return;
         form.style.display = "none";
         successPanel.classList.add("is-visible");
         successPanel.querySelector("[data-ref]").textContent = resultado.referencia;
@@ -363,7 +441,8 @@ const EMAILJS_CONFIG = {
             : `Guardaremos tu inscripción y te enviaremos el briefing a ${payload.email} en cuanto confirmemos los últimos detalles.`;
         });
         enviarNotificacionOrganizador(payload, op, resultado.referencia);
-        incrementarPlazasEnVivo();
+        if (op.contadorEnVivo) incrementarPlazasEnVivo();
+        if (window.actualizarRecuentoInscritos) window.actualizarRecuentoInscritos(op);
         if (usuarioActual && window.guardarPerfil) {
           window.guardarPerfil(usuarioActual.id, {
             nombre: payload.nombre,
@@ -393,7 +472,7 @@ const EMAILJS_CONFIG = {
             observaciones: payload.observaciones || "",
           });
         }
-      }
+      });
     });
   });
 })();

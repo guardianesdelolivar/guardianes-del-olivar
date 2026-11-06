@@ -17,7 +17,12 @@ const ESTADO_BADGE_CLASS = {
   finalizado: "badge--finalizado",
 };
 
+function tieneLimitePlazas(op) {
+  return typeof op.plazasTotal === "number" && op.plazasTotal > 0;
+}
+
 function porcentajeOcupacion(op) {
+  if (!tieneLimitePlazas(op)) return 0;
   return Math.round((op.plazasOcupadas / op.plazasTotal) * 100);
 }
 
@@ -29,6 +34,16 @@ function claseDisponibilidad(op) {
 }
 
 function availabilityHTML(op) {
+  if (!tieneLimitePlazas(op)) {
+    if (!op.recuentoDisponible) return "";
+    return `
+    <div class="availability">
+      <div class="availability__label">
+        <span>${op.plazasOcupadas} ${op.plazasOcupadas === 1 ? "OPERADOR APUNTADO" : "OPERADORES APUNTADOS"}</span>
+        <span>SIN LÍMITE</span>
+      </div>
+    </div>`;
+  }
   const pct = Math.min(100, porcentajeOcupacion(op));
   return `
     <div class="availability">
@@ -73,7 +88,7 @@ function opCardHTML(op, opts) {
   return `
   <article class="op-card reveal">
     <div class="op-card__media">
-      ${op.imagenCartel ? `<img class="op-card__media-img" src="${op.imagenCartel}" alt="Cartel de ${op.nombre}" />` : ""}
+      ${op.imagenCartel ? `<img class="op-card__media-img" src="${op.imagenCartel}" alt="Cartel de ${op.nombre}" width="800" height="993" loading="lazy" decoding="async" />` : ""}
       <span class="badge ${ESTADO_BADGE_CLASS[op.status]}"><span class="dot"></span>${ESTADO_TEXTO[op.status]}</span>
       <span class="op-card__code">${op.codigo} · ${op.tipo.toUpperCase()}</span>
     </div>
@@ -83,7 +98,7 @@ function opCardHTML(op, opts) {
         <li>📅 ${op.fechaDisplay}</li>
         <li>⏱️ ${op.horario}</li>
         <li>🎯 ${op.ubicacion}, ${op.localidad}</li>
-        <li>👥 ${op.plazasTotal - op.plazasOcupadas} plazas libres</li>
+        <li>👥 ${tieneLimitePlazas(op) ? `${op.plazasTotal - op.plazasOcupadas} plazas libres` : (op.recuentoDisponible ? `${op.plazasOcupadas} apuntados · sin límite` : "Plazas sin límite")}</li>
       </ul>
       <p class="op-card__desc">${op.resumen}</p>
       <div class="op-card__objectives"><ul>${objectivesHTML(op, 2)}</ul></div>
@@ -109,7 +124,8 @@ function opCardHTML(op, opts) {
 function renderOpGrid(container, lista, opts) {
   if (!container) return;
   if (!lista.length) {
-    container.innerHTML = `<div class="empty-state">NO HAY OPERACIONES QUE COINCIDAN CON LOS FILTROS SELECCIONADOS.</div>`;
+    const vacio = (opts && opts.vacio) || "NO HAY OPERACIONES QUE COINCIDAN CON LOS FILTROS SELECCIONADOS.";
+    container.innerHTML = `<div class="empty-state">${vacio}</div>`;
     return;
   }
   container.innerHTML = lista.map((op) => opCardHTML(op, opts)).join("");

@@ -102,23 +102,29 @@ window.guardarPerfil = guardarPerfil;
 window.subirAvatar = subirAvatar;
 
 // --- Estado de sesión en la barra de navegación (todas las páginas) ---
+// Con sesión iniciada: "Mi cuenta" pequeño + botón INSCRÍBETE normal.
+// Sin sesión: no se muestra INSCRÍBETE, solo un botón para crear cuenta.
 function pintarEstadoSesion() {
   const navActions = document.querySelector(".nav-actions");
   if (!navActions || !supabaseClient) return;
+  const inscribeteBtn = navActions.querySelector(".btn-primary");
   obtenerUsuarioActual().then((user) => {
     let link = navActions.querySelector("[data-auth-link]");
     if (!link) {
       link = document.createElement("a");
       link.setAttribute("data-auth-link", "");
-      link.className = "btn btn-outline";
       navActions.insertBefore(link, navActions.firstChild);
     }
     if (user) {
       link.textContent = "MI CUENTA";
       link.href = "login.html";
+      link.className = "nav-account-link";
+      if (inscribeteBtn) inscribeteBtn.style.display = "";
     } else {
-      link.textContent = "INICIAR SESIÓN";
+      link.textContent = "CREAR CUENTA";
       link.href = "login.html";
+      link.className = "btn btn-primary";
+      if (inscribeteBtn) inscribeteBtn.style.display = "none";
     }
   });
 }

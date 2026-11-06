@@ -10,6 +10,30 @@
     const userBlock = document.querySelector("[data-auth-user]");
     const userEmailEl = document.querySelector("[data-user-email]");
 
+    // Si se llega desde una inscripción (login.html?volver=inscripcion.html?op=...),
+    // al iniciar sesión se vuelve allí. Se guarda también en el navegador
+    // por si la persona confirma el email y vuelve a entrar más tarde.
+    // Solo se permite volver a páginas de esta misma web.
+    function destinoSeguro(valor) {
+      return typeof valor === "string" && /^inscripcion\.html\?op=[a-z0-9-]+$/i.test(valor) ? valor : null;
+    }
+    const params = new URLSearchParams(location.search);
+    let volver = destinoSeguro(params.get("volver"));
+    try {
+      if (volver) localStorage.setItem("gdo_volver", volver);
+      else volver = destinoSeguro(localStorage.getItem("gdo_volver"));
+    } catch (err) { /* almacenamiento no disponible: se ignora */ }
+    function irADestino() {
+      if (!volver) return false;
+      try { localStorage.removeItem("gdo_volver"); } catch (err) { /* se ignora */ }
+      location.href = volver;
+      return true;
+    }
+    if (volver) {
+      const aviso = document.querySelector("[data-volver-aviso]");
+      if (aviso) aviso.hidden = false;
+    }
+
     const tabLogin = document.querySelector('[data-tab-btn="login"]');
     const tabRegistro = document.querySelector('[data-tab-btn="registro"]');
     const loginForm = document.querySelector("[data-login-form]");
@@ -22,15 +46,22 @@
     const logoutBtn = document.querySelector("[data-logout-btn]");
     const avatarInput = document.querySelector("#p-avatar");
     const avatarPreview = document.querySelector("[data-avatar-preview]");
+    const avatarTrigger = document.querySelector("[data-avatar-trigger]");
 
     function mostrarAvatar(url) {
       if (!avatarPreview) return;
       if (url) {
         avatarPreview.src = url;
         avatarPreview.style.display = "block";
+        if (avatarTrigger) avatarTrigger.textContent = "EDITAR FOTO";
       } else {
         avatarPreview.style.display = "none";
+        if (avatarTrigger) avatarTrigger.textContent = "SUBIR FOTO";
       }
+    }
+
+    if (avatarTrigger && avatarInput) {
+      avatarTrigger.addEventListener("click", () => avatarInput.click());
     }
 
     if (avatarInput) {
@@ -62,6 +93,7 @@
         registroForm.style.display = "block";
         loginForm.style.display = "none";
       });
+      if (params.get("modo") === "registro") tabRegistro.click();
     }
 
     function mostrarEstado(user) {
@@ -109,6 +141,7 @@
         window.iniciarSesion(email, password).then((res) => {
           if (res.ok) {
             if (loginMsg) { loginMsg.textContent = ""; }
+            if (irADestino()) return;
             window.obtenerUsuarioActual().then(mostrarEstado);
           } else {
             if (loginMsg) { loginMsg.textContent = res.error; loginMsg.style.color = "var(--c-red-bright)"; }
@@ -136,7 +169,9 @@
         window.registrarUsuario(email, password, username).then((res) => {
           if (res.ok) {
             if (registroMsg) {
-              registroMsg.textContent = "¡Cuenta creada! Revisa tu email para confirmarla y luego inicia sesión.";
+              registroMsg.textContent = volver
+                ? "¡Cuenta creada! Revisa tu email para confirmarla, luego inicia sesión aquí y te llevamos directo a la inscripción."
+                : "¡Cuenta creada! Revisa tu email para confirmarla y luego inicia sesión.";
               registroMsg.style.color = "var(--c-green-bright)";
             }
             registroForm.reset();

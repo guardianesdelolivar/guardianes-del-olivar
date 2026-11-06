@@ -21,7 +21,7 @@
       const proximas = ordenadas.filter((op) => op.status !== "finalizado");
       const finalizadas = ordenadas.filter((op) => op.status === "finalizado").reverse();
 
-      renderOpGrid(grid, proximas, { expanded: true });
+      renderOpGrid(grid, proximas, { expanded: true, vacio: "AHORA MISMO NO HAY OPERACIONES PROGRAMADAS.<br />Anunciamos la próxima en el grupo de WhatsApp y en Instagram." });
 
       if (finalizadas.length) {
         renderOpGrid(gridPast, finalizadas, { expanded: false });

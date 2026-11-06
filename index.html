@@ -3,11 +3,23 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GUARDIANES DEL OLIVAR · Operaciones de Airsoft</title>
-<meta name="description" content="GUARDIANES DEL OLIVAR organiza operaciones de airsoft inmersivas: estrategia, adrenalina y compañerismo. Consulta el calendario, revisa el dossier de cada misión e inscríbete." />
+<title>GUARDIANES DEL OLIVAR · Operaciones de Airsoft en Aragón</title>
+<meta name="description" content="GUARDIANES DEL OLIVAR organiza operaciones de airsoft inmersivas en Aragón: estrategia, adrenalina y compañerismo. Consulta el calendario, revisa el dossier de cada misión e inscríbete." />
+<link rel="canonical" href="https://www.gdoaragon.es/" />
+<link rel="icon" href="assets/logo-180.png" type="image/png" />
+<link rel="apple-touch-icon" href="assets/logo-180.png" />
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="es_ES" />
+<meta property="og:site_name" content="Guardianes del Olivar" />
+<meta property="og:title" content="GUARDIANES DEL OLIVAR · Operaciones de Airsoft en Aragón" />
+<meta property="og:description" content="Operaciones de airsoft inmersivas en Aragón: estrategia, adrenalina y compañerismo. Consulta el calendario e inscríbete." />
+<meta property="og:url" content="https://www.gdoaragon.es/" />
+<meta property="og:image" content="https://www.gdoaragon.es/assets/foto%201.png" />
+<meta name="twitter:card" content="summary" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/css/styles.css" />
+<noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
 </head>
 <body>
 <a class="skip-link" href="#main">Saltar al contenido</a>
@@ -15,7 +27,7 @@
 <header class="navbar">
   <div class="navbar__inner">
     <a class="brand" href="index.html">
-      <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+      <span class="brand__mark"><img src="assets/logo.webp" alt="Guardianes del Olivar" width="44" height="44" /></span>
       <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
     </a>
     <nav aria-label="Navegación principal">
@@ -42,7 +54,7 @@
   <section class="section section--tight" style="border-bottom:var(--border-hairline);">
     <div class="container" style="text-align:center;">
       <div style="display:flex;align-items:center;justify-content:center;gap:28px;margin-bottom:28px;flex-wrap:wrap;">
-        <img src="assets/foto%201.png" alt="Guardianes del Olivar — Airsoft Aragón" style="width:220px;height:220px;border-radius:50%;object-fit:cover;border:2px solid var(--c-green-bright);box-shadow:0 0 60px rgba(111,154,90,0.35);flex-shrink:0;" />
+        <img src="assets/logo.webp" alt="Guardianes del Olivar — Airsoft Aragón" width="220" height="220" fetchpriority="high" decoding="async" style="width:220px;height:220px;border-radius:50%;object-fit:cover;border:2px solid var(--c-green-bright);box-shadow:0 0 60px rgba(111,154,90,0.35);flex-shrink:0;" />
         <div style="text-align:left;">
           <h2 style="margin-bottom:6px;font-size:clamp(26px,4vw,38px);letter-spacing:0.05em;">GUARDIANES DEL OLIVAR</h2>
           <p class="divider-coords" style="margin:0;">AIRSOFT ARAGÓN</p>
@@ -57,15 +69,15 @@
         <div class="countdown__item"><span class="countdown__num" data-cd-secs>00</span><span class="countdown__label">Seg</span></div>
       </div>
       <div style="margin-top:28px;">
-        <a class="btn btn-primary btn-lg" href="operaciones.html">VER DETALLES E INSCRIBIRME</a>
+        <a class="btn btn-primary btn-lg" href="operaciones.html" data-countdown-cta>VER DETALLES E INSCRIBIRME</a>
       </div>
     </div>
   </section>
 
   <section class="stat-strip">
     <div class="stat-strip__item">
-      <div class="stat-strip__label">Operadores online</div>
-      <div class="stat-strip__value accent" data-operators-online>—</div>
+      <div class="stat-strip__label">Operaciones activas</div>
+      <div class="stat-strip__value accent" data-ops-activas>—</div>
     </div>
     <div class="stat-strip__item">
       <div class="stat-strip__label">Próxima operación</div>
@@ -88,7 +100,7 @@
     <div class="hero__content">
       <div class="hud-row">
         <span class="hud-chip"><span class="dot"></span>STATUS: OPERATIONAL</span>
-        <span class="hud-chip"><span class="dot"></span>NEXT OPERATION: <span data-next-op-date>—</span></span>
+        <span class="hud-chip" data-hero-next-chip><span class="dot"></span>NEXT OPERATION: <span data-next-op-date>—</span></span>
         <span class="hud-chip is-alert"><span class="dot"></span>THREAT LEVEL: HIGH</span>
         <span class="hud-chip is-warn"><span class="dot"></span>MISSION STATUS: ACTIVE</span>
       </div>
@@ -164,7 +176,7 @@
     <div class="footer__top">
       <div>
         <div class="brand" style="margin-bottom:14px;">
-          <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+          <span class="brand__mark"><img src="assets/logo.webp" alt="Guardianes del Olivar" width="44" height="44" /></span>
           <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
         </div>
         <p style="max-width:320px;font-size:13.5px;">Organización dedicada a crear operaciones de airsoft inmersivas basadas en estrategia, adrenalina y compañerismo.</p>

@@ -5,9 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Inscripción · GUARDIANES DEL OLIVAR</title>
 <meta name="description" content="Formulario de inscripción a las operaciones de airsoft de GUARDIANES DEL OLIVAR." />
+<meta name="robots" content="noindex,follow" />
+<link rel="icon" href="assets/logo-180.png" type="image/png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/css/styles.css" />
+<noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
 </head>
 <body>
 <a class="skip-link" href="#main">Saltar al contenido</a>
@@ -15,7 +18,7 @@
 <header class="navbar">
   <div class="navbar__inner">
     <a class="brand" href="index.html">
-      <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+      <span class="brand__mark"><img src="assets/logo.webp" alt="Guardianes del Olivar" width="44" height="44" /></span>
       <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
     </a>
     <nav aria-label="Navegación principal">
@@ -43,7 +46,7 @@
     <div class="container">
       <span class="eyebrow">Sistema de inscripciones</span>
       <h1 style="font-size:clamp(30px,5vw,48px);">CONFIRMAR PARTICIPACIÓN</h1>
-      <p class="lede" style="max-width:620px;margin-top:10px;">Completa tus datos de operador para asegurar tu plaza. La pasarela de pago se activará próximamente; por ahora esta inscripción queda registrada como preinscripción.</p>
+      <p class="lede" style="max-width:620px;margin-top:10px;">Completa tus datos de operador para asegurar tu plaza. La pasarela de pago se activará próximamente; por ahora esta inscripción queda registrada como preinscripción. Para inscribirte necesitas una cuenta: así cada persona se apunta una sola vez.</p>
     </div>
   </div>
 
@@ -71,37 +74,37 @@
             <div class="form-grid cols-2">
               <div class="field">
                 <label for="nombre">Nombre *</label>
-                <input type="text" id="nombre" name="nombre" required />
+                <input type="text" id="nombre" name="nombre" autocomplete="given-name" required />
                 <span class="field__error">Introduce tu nombre.</span>
               </div>
               <div class="field">
                 <label for="apellidos">Apellidos *</label>
-                <input type="text" id="apellidos" name="apellidos" required />
+                <input type="text" id="apellidos" name="apellidos" autocomplete="family-name" required />
                 <span class="field__error">Introduce tus apellidos.</span>
               </div>
               <div class="field">
                 <label for="dni">DNI / NIE *</label>
-                <input type="text" id="dni" name="dni" placeholder="12345678A" required />
+                <input type="text" id="dni" name="dni" placeholder="12345678A" autocomplete="off" autocapitalize="characters" required />
                 <span class="field__error">Formato no válido.</span>
               </div>
               <div class="field">
                 <label for="telefono">Teléfono *</label>
-                <input type="tel" id="telefono" name="telefono" placeholder="600 000 000" required />
+                <input type="tel" id="telefono" name="telefono" placeholder="600 000 000" autocomplete="tel" inputmode="tel" required />
                 <span class="field__error">Introduce un teléfono válido.</span>
               </div>
               <div class="field">
                 <label for="email">Email *</label>
-                <input type="email" id="email" name="email" required />
+                <input type="email" id="email" name="email" autocomplete="email" inputmode="email" required />
                 <span class="field__error">Introduce un email válido.</span>
               </div>
               <div class="field">
                 <label for="callsign">Nombre de operador / callsign *</label>
-                <input type="text" id="callsign" name="callsign" required />
+                <input type="text" id="callsign" name="callsign" autocomplete="nickname" required />
                 <span class="field__error">Introduce tu callsign.</span>
               </div>
               <div class="field">
                 <label for="equipo">Equipo (opcional)</label>
-                <input type="text" id="equipo" name="equipo" placeholder="Nombre de tu equipo, si tienes" />
+                <input type="text" id="equipo" name="equipo" placeholder="Nombre de tu equipo, si tienes" autocomplete="off" />
               </div>
               <div class="field">
                 <label for="experiencia">Experiencia *</label>
@@ -118,7 +121,7 @@
 
             <div class="field" style="margin-top:18px;">
               <label for="observaciones">Observaciones (alergias, necesidades especiales, etc.)</label>
-              <textarea id="observaciones" name="observaciones" rows="4"></textarea>
+              <textarea id="observaciones" name="observaciones" rows="4" autocomplete="off"></textarea>
             </div>
 
             <div class="field-check-block" style="margin-top:18px;background:var(--c-black-soft);border:var(--border-hairline);border-radius:var(--radius);padding:16px 18px;">
@@ -141,7 +144,7 @@
                 </div>
                 <div class="field" data-almuerzo-otro-wrap style="display:none;margin-top:12px;">
                   <label for="almuerzo_otro">¿Qué te gustaría almorzar?</label>
-                  <input type="text" id="almuerzo_otro" name="almuerzo_otro" placeholder="Escribe tu opción" />
+                  <input type="text" id="almuerzo_otro" name="almuerzo_otro" placeholder="Escribe tu opción" autocomplete="off" />
                   <span class="field__error">Indica qué te gustaría almorzar.</span>
                 </div>
               </div>
@@ -157,10 +160,11 @@
                 He leído la información relativa a los riesgos de la actividad.
               </label>
               <label class="field-check">
-                <input type="checkbox" name="acepta_fotos" required />
-                Doy mi consentimiento para que se hagan fotos y vídeos durante la operación y puedan publicarse en Instagram, WhatsApp o la galería de la web.
+                <input type="checkbox" name="acepta_fotos" />
+                (Opcional) Doy mi consentimiento para que las fotos y vídeos en los que aparezca durante la operación puedan publicarse en Instagram, WhatsApp o la galería de la web. Puedes inscribirte igualmente sin marcar esta casilla.
               </label>
-              <p class="form-note">El pago (<strong data-precio-total>10 €</strong>) se hace en efectivo, en el propio campo, una vez rellenes la documentación el día de la partida. Esta inscripción no supone ningún cargo ahora mismo.</p>
+              <p class="form-note">El pago (<strong data-precio-total>—</strong>) se hace en efectivo, en el propio campo, una vez rellenes la documentación el día de la partida. Esta inscripción no supone ningún cargo ahora mismo.</p>
+              <p class="form-error" data-error-envio role="alert"></p>
               <button type="submit" class="btn btn-primary btn-lg btn-block">CONFIRMAR INSCRIPCIÓN</button>
             </div>
           </form>
@@ -190,7 +194,7 @@
     <div class="footer__top">
       <div>
         <div class="brand" style="margin-bottom:14px;">
-          <span class="brand__mark"><img src="assets/foto%201.png" alt="Guardianes del Olivar" /></span>
+          <span class="brand__mark"><img src="assets/logo.webp" alt="Guardianes del Olivar" width="44" height="44" /></span>
           <span>GUARDIANES DEL OLIVAR<span class="brand__sub">Airsoft Aragón</span></span>
         </div>
         <p style="max-width:320px;font-size:13.5px;">Organización dedicada a crear operaciones de airsoft inmersivas basadas en estrategia, adrenalina y compañerismo.</p>

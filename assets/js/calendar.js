@@ -100,7 +100,7 @@
           <dt class="divider-coords">FECHA</dt><dd>${op.fechaDisplay}</dd>
           <dt class="divider-coords">LUGAR</dt><dd>${op.ubicacion}, ${op.localidad}</dd>
           <dt class="divider-coords">HORARIO</dt><dd>${op.horario}</dd>
-          <dt class="divider-coords">PLAZAS</dt><dd>${op.plazasOcupadas}/${op.plazasTotal}</dd>
+          <dt class="divider-coords">PLAZAS</dt><dd>${tieneLimitePlazas(op) ? `${op.plazasOcupadas}/${op.plazasTotal}` : (op.recuentoDisponible ? `${op.plazasOcupadas} apuntados (sin límite)` : "Sin límite")}</dd>
           <dt class="divider-coords">PRECIO</dt><dd>${op.precio} €</dd>
         </dl>
         ${availabilityHTML(op)}
