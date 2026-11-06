@@ -115,8 +115,79 @@
       if (params.get("modo") === "registro") tabRegistro.click();
     }
 
+    // ---- Mis partidas ----
+    const misPartidas = document.querySelector("[data-mis-partidas]");
+    function escapar(t) { return String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+    function cargarMisPartidas(user) {
+      if (!misPartidas || !window.supabaseClient) return;
+      window.supabaseClient
+        .from("inscripciones_registro")
+        .select("id, operacion_id, created_at, datos")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .then(({ data, error }) => {
+          if (error) { misPartidas.innerHTML = `<p class="form-note">No se han podido cargar tus partidas.</p>`; return; }
+          if (!data || !data.length) {
+            misPartidas.innerHTML = `<p class="form-note">Todavía no estás apuntado a ninguna partida. <a href="operaciones.html" style="color:var(--c-green-bright);">Ver operaciones</a></p>`;
+            return;
+          }
+          misPartidas.innerHTML = data.map((fila) => {
+            const op = typeof obtenerOperacionPorId === "function" ? obtenerOperacionPorId(fila.operacion_id) : null;
+            const nombre = op ? op.nombre : (fila.datos && fila.datos.operacion) || fila.operacion_id;
+            const fecha = op ? op.fechaDisplay : (fila.datos && fila.datos.fechaDisplay) || "";
+            const pasada = op ? op.status === "finalizado" : false;
+            return `
+              <div class="mi-partida" data-fila="${fila.id}">
+                <div>
+                  <strong>${escapar(nombre)}</strong>
+                  <span>${escapar(fecha)}${fila.datos && fila.datos.duerme ? " · duermes en el campo" : ""}</span>
+                </div>
+                <div class="mi-partida__acciones">
+                  ${op ? `<a class="btn btn-outline" href="operacion.html?op=${encodeURIComponent(op.id)}">DOSSIER</a>` : ""}
+                  ${pasada ? `<span class="tag">JUGADA</span>` : `<button type="button" class="btn btn-outline btn-baja" data-baja="${fila.id}">DARME DE BAJA</button>`}
+                </div>
+              </div>`;
+          }).join("");
+        });
+    }
+    if (misPartidas) {
+      misPartidas.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-baja]");
+        if (!btn) return;
+        // Confirmación en dos pasos, dentro de la propia página.
+        if (!btn.classList.contains("is-confirmando")) {
+          btn.classList.add("is-confirmando");
+          btn.textContent = "¿SEGURO? PULSA OTRA VEZ";
+          setTimeout(() => { if (btn.isConnected) { btn.classList.remove("is-confirmando"); btn.textContent = "DARME DE BAJA"; } }, 4000);
+          return;
+        }
+        btn.disabled = true;
+        btn.textContent = "DANDO DE BAJA…";
+        window.supabaseClient
+          .from("inscripciones_registro")
+          .delete()
+          .eq("id", btn.getAttribute("data-baja"))
+          .select("id")
+          .then(({ data, error }) => {
+            if (error || !data || !data.length) {
+              btn.disabled = false;
+              btn.textContent = "NO SE PUDO. ESCRÍBENOS";
+              return;
+            }
+            window.obtenerUsuarioActual().then((u) => u && cargarMisPartidas(u));
+          });
+      });
+    }
+
     function mostrarEstado(user) {
       if (user) {
+        cargarMisPartidas(user);
+        if (window.supabaseClient) {
+          window.supabaseClient.rpc("es_organizador").then(({ data }) => {
+            const acceso = document.querySelector("[data-organizador-acceso]");
+            if (acceso && data === true) acceso.hidden = false;
+          });
+        }
         if (guestBlock) guestBlock.style.display = "none";
         if (userBlock) userBlock.style.display = "block";
         if (userEmailEl) userEmailEl.textContent = user.email;

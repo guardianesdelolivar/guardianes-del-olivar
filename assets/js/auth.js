@@ -127,6 +127,16 @@ function pintarEstadoSesion() {
     const menuCuenta = menu ? menu.querySelector("[data-menu-cuenta]") : null;
     if (menuCuenta) menuCuenta.textContent = user ? "Mi cuenta" : "Crear cuenta / Entrar";
 
+    // Solo los organizadores ven el acceso a la lista de inscritos.
+    if (user && menu && !menu.querySelector("[data-menu-organizador]")) {
+      supabaseClient.rpc("es_organizador").then(({ data }) => {
+        if (data !== true || menu.querySelector("[data-menu-organizador]")) return;
+        const li = document.createElement("li");
+        li.innerHTML = '<a href="organizador.html" data-menu-organizador>Organizador</a>';
+        menu.appendChild(li);
+      });
+    }
+
     if (user) {
       link.textContent = "MI CUENTA";
       link.href = "login.html";

@@ -16,6 +16,7 @@
  *                            la hoja, así que solo una operación debe tenerlo.
  *   almuerzo: false       -> oculta la opción de almuerzo (+10 €) al inscribirse.
  *   duracionHoras         -> duración para el archivo de calendario (.ics).
+ *   pernocta: true        -> al inscribirse se pregunta si se queda a dormir.
  */
 
 const OPERACIONES = [
@@ -42,6 +43,7 @@ const OPERACIONES = [
     plazasOcupadas: 0,
     maxParticipantes: 30,
     almuerzo: false,
+    pernocta: true,
     status: "abiertas",
     dificultad: "Todos los niveles",
     facciones: [],

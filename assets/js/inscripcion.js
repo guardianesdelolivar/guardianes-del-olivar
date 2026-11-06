@@ -265,11 +265,32 @@ const EMAILJS_CONFIG = {
 
     // Guarda la inscripción en la base de datos ANTES de dar la plaza por
     // confirmada. Si la cuenta ya estaba inscrita, la base de datos lo rechaza.
-    function reservarPlaza() {
+    function reservarPlaza(payload) {
       if (!usuarioActual || !window.supabaseClient) return Promise.resolve("sin-sesion");
+      // Se guarda una copia de los datos de la inscripción: la usa la lista
+      // del organizador y el recordatorio automático por email.
+      const datos = {
+        fecha: op.fecha,
+        fechaDisplay: op.fechaDisplay,
+        horario: op.horario,
+        operacion: op.nombre,
+        ubicacion: `${op.ubicacion}, ${op.localidad}`,
+        nombre: payload.nombre,
+        apellidos: payload.apellidos,
+        callsign: payload.callsign,
+        telefono: payload.telefono,
+        email: payload.email,
+        experiencia: payload.experiencia,
+        equipo: payload.equipo || "",
+        observaciones: payload.observaciones || "",
+        duerme: op.pernocta ? !!payload.duerme : null,
+        almuerzo: payload.quiereAlmuerzo ? payload.almuerzo : null,
+        fotos: !!payload.aceptaFotos,
+        precio: payload.precioFinal,
+      };
       return window.supabaseClient
         .from("inscripciones_registro")
-        .insert({ user_id: usuarioActual.id, operacion_id: op.id })
+        .insert({ user_id: usuarioActual.id, operacion_id: op.id, datos })
         .then(({ error }) => {
           if (!error) return "ok";
           if (error.code === "23505") return "duplicada";
@@ -307,8 +328,10 @@ const EMAILJS_CONFIG = {
 
     // Almuerzo opcional (+10 €). Se oculta en operaciones donde cada
     // jugador trae su comida (almuerzo: false en operaciones.js).
+    const bloquePernocta = form.querySelector("[data-pernocta-block]");
+    if (bloquePernocta && op.pernocta) bloquePernocta.hidden = false;
     if (op.almuerzo === false) {
-      const bloqueAlmuerzo = form.querySelector(".field-check-block");
+      const bloqueAlmuerzo = form.querySelector("[data-almuerzo-block]");
       if (bloqueAlmuerzo) bloqueAlmuerzo.remove();
     }
     const almuerzoToggle = form.querySelector("[data-almuerzo-toggle]");
@@ -408,6 +431,7 @@ const EMAILJS_CONFIG = {
         quiereAlmuerzo: quiereAlmuerzo,
         almuerzo: almuerzoElegido,
         precioFinal: precioFinal,
+        duerme: data.get("duerme") === "on",
       };
 
       const submitBtn = form.querySelector('button[type="submit"]');
@@ -415,7 +439,7 @@ const EMAILJS_CONFIG = {
       if (errorEnvio) errorEnvio.textContent = "";
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "CONFIRMANDO…"; }
 
-      reservarPlaza().then((reserva) => {
+      reservarPlaza(payload).then((reserva) => {
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "CONFIRMAR INSCRIPCIÓN"; }
         if (reserva === "sin-sesion") {
           if (errorEnvio) errorEnvio.textContent = "Tu sesión ha caducado. Vuelve a iniciar sesión para inscribirte.";

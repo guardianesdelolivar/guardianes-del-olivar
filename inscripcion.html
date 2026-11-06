@@ -126,7 +126,14 @@
               <textarea id="observaciones" name="observaciones" rows="4" autocomplete="off"></textarea>
             </div>
 
-            <div class="field-check-block" style="margin-top:18px;background:var(--c-black-soft);border:var(--border-hairline);border-radius:var(--radius);padding:16px 18px;">
+            <div class="field-check-block" data-pernocta-block hidden style="margin-top:18px;background:var(--c-black-soft);border:var(--border-hairline);border-radius:var(--radius);padding:16px 18px;">
+              <label class="field-check">
+                <input type="checkbox" name="duerme" />
+                Me quedo a dormir en el campo (en la carpa, con mi saco de dormir)
+              </label>
+            </div>
+
+            <div class="field-check-block" data-almuerzo-block style="margin-top:18px;background:var(--c-black-soft);border:var(--border-hairline);border-radius:var(--radius);padding:16px 18px;">
               <label class="field-check">
                 <input type="checkbox" name="quiere_almuerzo" data-almuerzo-toggle />
                 Quiero almorzar durante la partida (+10 €)
