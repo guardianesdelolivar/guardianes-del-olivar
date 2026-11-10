@@ -625,6 +625,10 @@ body { padding-top: var(--header-h); }
 .comment-item__fecha { font-family: var(--ff-mono); font-size: 11px; color: var(--c-grey-dim); white-space: nowrap; }
 .comment-item p { font-size: 13.5px; color: var(--c-off-white); }
 .comment-form { border-top: var(--border-hairline); padding-top: 20px; }
+.comment-form__autor { margin: 0; font-family: var(--ff-mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--c-grey-dim); }
+.comment-form__autor strong { color: var(--c-green-bright); }
+.comment-item__borrar { margin-left: auto; background: none; border: 1px solid var(--c-grey-dim); color: var(--c-grey-dim); font-family: var(--ff-mono); font-size: 10px; letter-spacing: .08em; padding: 3px 8px; cursor: pointer; }
+.comment-item__borrar:hover, .comment-item__borrar.is-confirmando { color: #e0614f; border-color: #e0614f; }
 
 /* ---------- Normas ---------- */
 .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }

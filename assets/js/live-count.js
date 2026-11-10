@@ -95,30 +95,58 @@ function incrementarPlazasEnVivo() {
  * el script de Apps Script tenga las acciones comentarios_listar y
  * comentarios_nuevo añadidas.
  */
-function listarComentarios(opId) {
-  if (!contadorConfigurado()) return Promise.resolve([]);
+// Comentarios publicados antes del cambio a cuentas (se guardaban en la hoja
+// de Google). Se siguen mostrando, pero solo los anteriores a esta fecha:
+// lo que llegue ahora por esa vía ya no se publica.
+const CORTE_COMENTARIOS_ANTIGUOS = Date.parse("2026-11-10T10:00:00Z");
+
+function listarComentariosAntiguos(opId) {
   return fetch(`${CONTADOR_URL}?action=comentarios_listar&op=${encodeURIComponent(opId)}`)
-    .then((r) => r.json())
+    .then((res) => res.json())
     .then((data) => (Array.isArray(data.comentarios) ? data.comentarios : []))
-    .catch((err) => {
-      console.error("No se pudieron cargar los comentarios:", err);
-      return [];
+    .then((lista) => lista.filter((c) => Date.parse(c.fecha) < CORTE_COMENTARIOS_ANTIGUOS))
+    .catch(() => []);
+}
+
+/**
+ * Comentarios: se guardan en Supabase. Solo se puede comentar con sesión
+ * iniciada, y el nombre que aparece lo pone el servidor a partir del perfil
+ * (callsign, o si no, nombre de usuario): no se puede escribir otro.
+ */
+function listarComentarios(opId) {
+  const cliente = window.supabaseClient;
+  const nuevos = cliente
+    ? cliente.from("comentarios").select("id, user_id, autor, texto, created_at").eq("operacion_id", opId).order("created_at", { ascending: true })
+        .then(({ data }) => (data || []).map((c) => ({ id: c.id, user_id: c.user_id, nombre: c.autor, texto: c.texto, fecha: c.created_at })))
+        .catch(() => [])
+    : Promise.resolve([]);
+  return Promise.all([listarComentariosAntiguos(opId), nuevos])
+    .then(([antiguos, actuales]) => antiguos.concat(actuales).sort((x, y) => Date.parse(x.fecha) - Date.parse(y.fecha)));
+}
+
+function enviarComentario(opId, texto) {
+  const cliente = window.supabaseClient;
+  if (!cliente) return Promise.resolve({ error: "Sin conexión con el sistema de cuentas." });
+  return cliente.from("comentarios").insert({ operacion_id: opId, texto }).select("id").single()
+    .then(({ error }) => {
+      if (!error) return { ok: true };
+      const m = error.message || "";
+      if (m.includes("SIN_SESION")) return { error: "Tu sesión ha caducado. Vuelve a iniciar sesión." };
+      if (m.includes("SIN_NOMBRE")) return { error: "Pon tu callsign o nombre de usuario en «Mi cuenta» para poder comentar." };
+      if (m.includes("DEMASIADOS")) return { error: "Has comentado muchas veces seguidas. Espera un minuto." };
+      return { error: "No se pudo publicar el comentario. Inténtalo de nuevo." };
     });
 }
 
-function enviarComentario(opId, nombre, texto) {
-  if (!contadorConfigurado()) return Promise.resolve(null);
-  const params = new URLSearchParams({ action: "comentarios_nuevo", op: opId, nombre, texto });
-  return fetch(`${CONTADOR_URL}?${params.toString()}`)
-    .then((r) => r.json())
-    .then((data) => (data && data.ok ? data.comentario : null))
-    .catch((err) => {
-      console.error("No se pudo enviar el comentario:", err);
-      return null;
-    });
+function borrarComentario(id) {
+  const cliente = window.supabaseClient;
+  if (!cliente) return Promise.resolve(false);
+  return cliente.from("comentarios").delete().eq("id", id).select("id").then(({ data }) => !!(data && data.length));
 }
+
 window.listarComentarios = listarComentarios;
 window.enviarComentario = enviarComentario;
+window.borrarComentario = borrarComentario;
 
 /**
  * REGISTRO DE INSCRIPCIONES EN HOJA DE CÁLCULO — usa el mismo Apps Script

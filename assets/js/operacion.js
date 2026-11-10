@@ -215,67 +215,109 @@
     const comentariosLista = document.querySelector("[data-comentarios-lista]");
     const comentarioForm = document.querySelector("[data-comentario-form]");
 
+    // Comentarios: solo con cuenta, y el nombre lo pone el servidor a partir
+    // del perfil (callsign o nombre de usuario). No se puede escribir otro.
+    let usuarioComentario = null;
+    let puedeModerar = false;
+
     function renderComentarios(lista) {
       if (!comentariosLista) return;
       if (!lista.length) {
         comentariosLista.innerHTML = `<p class="empty-state">Todavía no hay comentarios. ¡Sé el primero!</p>`;
         return;
       }
-      comentariosLista.innerHTML = lista.map((c) => `
+      comentariosLista.innerHTML = lista.map((c) => {
+        const borrable = c.id && usuarioComentario && (c.user_id === usuarioComentario.id || puedeModerar);
+        return `
         <div class="comment-item">
           <div class="comment-item__meta">
             <span class="comment-item__nombre">${escapeHTML(c.nombre)}</span>
             <span class="comment-item__fecha">${formatearFecha(c.fecha)}</span>
+            ${borrable ? `<button type="button" class="comment-item__borrar" data-borrar-comentario="${escapeHTML(c.id)}">BORRAR</button>` : ""}
           </div>
           <p>${escapeHTML(c.texto)}</p>
-        </div>`).join("");
+        </div>`;
+      }).join("");
     }
 
-    if (comentariosLista && window.listarComentarios) {
-      window.listarComentarios(op.id).then(renderComentarios);
+    function recargarComentarios() {
+      if (comentariosLista && window.listarComentarios) window.listarComentarios(op.id).then(renderComentarios);
     }
 
-    // Solo se puede comentar con la sesión iniciada: así se evita spam anónimo.
+    const sesionComentarios = window.obtenerUsuarioActual ? window.obtenerUsuarioActual() : Promise.resolve(null);
+
     if (comentarioForm) {
       comentarioForm.hidden = true;
       const avisoComentario = document.createElement("p");
       avisoComentario.className = "form-note";
       avisoComentario.innerHTML = `Para comentar, <a href="login.html" style="color:var(--c-green-bright);">inicia sesión o crea tu cuenta</a>.`;
       comentarioForm.insertAdjacentElement("beforebegin", avisoComentario);
-      const sesion = window.obtenerUsuarioActual ? window.obtenerUsuarioActual() : Promise.resolve(null);
-      sesion.then((user) => {
+      const autorEl = comentarioForm.querySelector("[data-comentario-autor]");
+      const errorEl = comentarioForm.querySelector("[data-comentario-error]");
+      const btn = comentarioForm.querySelector('button[type="submit"]');
+
+      sesionComentarios.then((user) => {
         if (!user) return;
         avisoComentario.remove();
         comentarioForm.hidden = false;
         if (window.obtenerPerfil) {
           window.obtenerPerfil(user.id).then((perfil) => {
-            const nombreInput = comentarioForm.querySelector('[name="nombre"]');
-            const alias = perfil && (perfil.callsign || perfil.username);
-            if (nombreInput && !nombreInput.value && alias) nombreInput.value = alias;
+            const alias = perfil && [perfil.callsign, perfil.username, perfil.nombre].map((v) => (v || "").trim()).find(Boolean);
+            if (alias) {
+              autorEl.textContent = alias.slice(0, 40);
+            } else {
+              autorEl.textContent = "(sin nombre)";
+              errorEl.innerHTML = `Pon tu callsign en <a href="mi-cuenta.html" style="color:var(--c-green-bright);">Mi cuenta</a> para poder comentar.`;
+              btn.disabled = true;
+            }
           });
         }
       });
-    }
 
-    if (comentarioForm && window.enviarComentario) {
       comentarioForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        const nombre = comentarioForm.nombre.value.trim();
         const texto = comentarioForm.texto.value.trim();
-        if (!nombre || !texto) return;
-        const btn = comentarioForm.querySelector("button");
+        if (!texto || !window.enviarComentario) return;
+        errorEl.textContent = "";
         btn.disabled = true;
         btn.textContent = "PUBLICANDO…";
-        window.enviarComentario(op.id, nombre, texto).then((nuevo) => {
+        window.enviarComentario(op.id, texto).then((res) => {
           btn.disabled = false;
           btn.textContent = "PUBLICAR COMENTARIO";
-          comentarioForm.reset();
-          if (nuevo && comentariosLista) {
-            window.listarComentarios(op.id).then(renderComentarios);
+          if (res && res.ok) {
+            comentarioForm.reset();
+            recargarComentarios();
+          } else {
+            errorEl.textContent = (res && res.error) || "No se pudo publicar el comentario.";
           }
         });
       });
     }
+
+    if (comentariosLista) {
+      comentariosLista.addEventListener("click", (e) => {
+        const b = e.target.closest("[data-borrar-comentario]");
+        if (!b || !window.borrarComentario) return;
+        if (!b.classList.contains("is-confirmando")) {
+          b.classList.add("is-confirmando");
+          b.textContent = "¿SEGURO?";
+          setTimeout(() => { if (b.isConnected) { b.classList.remove("is-confirmando"); b.textContent = "BORRAR"; } }, 4000);
+          return;
+        }
+        b.disabled = true;
+        window.borrarComentario(b.getAttribute("data-borrar-comentario")).then(recargarComentarios);
+      });
+    }
+
+    sesionComentarios.then((user) => {
+      usuarioComentario = user;
+      if (!user || !window.supabaseClient) return recargarComentarios();
+      window.supabaseClient.rpc("es_organizador").then(({ data }) => {
+        puedeModerar = data === true;
+        recargarComentarios();
+      }, recargarComentarios);
+    });
+    if (!window.obtenerUsuarioActual) recargarComentarios();
 
     // --- Compartir, copiar enlace y añadir a calendario ---
     const feedback = document.querySelector("[data-share-feedback]");

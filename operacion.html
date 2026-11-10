@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://www.gdoaragon.es/assets/foto%201.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/css/styles.css?v=20261106b" />
+<link rel="stylesheet" href="assets/css/styles.css?v=20261110" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
 </head>
 <body>
@@ -113,14 +113,12 @@
               <h3>Comentarios</h3>
               <div class="comments-list" data-comentarios-lista><p class="empty-state">Cargando comentarios…</p></div>
               <form class="comment-form" data-comentario-form>
-                <div class="field">
-                  <label for="com-nombre">Tu nombre</label>
-                  <input type="text" id="com-nombre" name="nombre" required maxlength="40" />
-                </div>
+                <p class="comment-form__autor">Comentas como <strong data-comentario-autor>…</strong></p>
                 <div class="field" style="margin-top:12px;">
                   <label for="com-texto">Comentario</label>
                   <textarea id="com-texto" name="texto" rows="3" required maxlength="500"></textarea>
                 </div>
+                <p class="form-error" data-comentario-error role="alert"></p>
                 <button type="submit" class="btn btn-outline" style="margin-top:12px;">PUBLICAR COMENTARIO</button>
               </form>
             </div>
@@ -201,12 +199,12 @@
   </div>
 </footer>
 
-<script src="assets/js/data/operaciones.js?v=20261106b"></script>
-<script src="assets/js/live-count.js?v=20261106b"></script>
-<script src="assets/js/cards.js?v=20261106b"></script>
-<script src="assets/vendor/supabase-2.118.0.js?v=20261106b"></script>
-<script src="assets/js/auth.js?v=20261106b"></script>
-<script src="assets/js/main.js?v=20261106b"></script>
-<script src="assets/js/operacion.js?v=20261106b"></script>
+<script src="assets/js/data/operaciones.js?v=20261110"></script>
+<script src="assets/js/live-count.js?v=20261110"></script>
+<script src="assets/js/cards.js?v=20261110"></script>
+<script src="assets/vendor/supabase-2.118.0.js?v=20261110"></script>
+<script src="assets/js/auth.js?v=20261110"></script>
+<script src="assets/js/main.js?v=20261110"></script>
+<script src="assets/js/operacion.js?v=20261110"></script>
 </body>
 </html>
