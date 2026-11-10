@@ -15,7 +15,7 @@
     return new URLSearchParams(location.search).get(name);
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     const id = getParam("op");
     const op = id ? obtenerOperacionPorId(id) : null;
     const root = document.querySelector("[data-dossier-root]");
@@ -70,7 +70,7 @@
               "addressCountry": "ES"
             }
           },
-          "image": [`https://www.gdoaragon.es/${op.imagenCartelCompartir || op.imagenCartel}`],
+          "image": [/^https?:/.test(op.imagenCartelCompartir || op.imagenCartel || "") ? (op.imagenCartelCompartir || op.imagenCartel) : `https://www.gdoaragon.es/${op.imagenCartelCompartir || op.imagenCartel}`],
           "organizer": {
             "@type": "Organization",
             "name": "Guardianes del Olivar",
@@ -110,6 +110,35 @@
     document.querySelector("[data-op-codigo]").textContent = `${op.codigo} · ${op.fechaDisplay} · ${op.ubicacion}, ${op.localidad}`;
 
     document.querySelector("[data-op-resumen]").textContent = op.resumen;
+
+    // Parte meteorológico (solo partidas que no han pasado)
+    const tiempoBloque = document.querySelector("[data-op-tiempo-block]");
+    if (tiempoBloque) {
+      if (op.status === "finalizado" || !window.TiempoCampo) tiempoBloque.hidden = true;
+      else window.TiempoCampo.pintar(document.querySelector("[data-op-tiempo]"), op);
+    }
+
+    // Crónica, cuando la partida ya se ha jugado
+    const cronicaBloque = document.querySelector("[data-op-cronica-block]");
+    if (cronicaBloque && op.cronica) {
+      const cronicaEl = document.querySelector("[data-op-cronica]");
+      cronicaEl.innerHTML = "";
+      op.cronica.split(/\n{2,}/).forEach((parrafo) => {
+        const pEl = document.createElement("p");
+        pEl.textContent = parrafo.trim();
+        cronicaEl.appendChild(pEl);
+      });
+      const res = document.querySelector("[data-op-resultados]");
+      res.innerHTML = "";
+      (op.resultados || []).forEach((r) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span></span><strong></strong>`;
+        li.querySelector("span").textContent = r.mision;
+        li.querySelector("strong").textContent = r.ganador;
+        res.appendChild(li);
+      });
+      cronicaBloque.hidden = false;
+    }
 
     // Cartel de la operación dentro del propio dossier (antes solo salía en las tarjetas).
     const cartelBlock = document.querySelector("[data-op-cartel-block]");
@@ -179,10 +208,10 @@
       document.querySelector("[data-op-availability]").innerHTML = availabilityHTML(op);
 
       const ctaBtn = document.querySelector("[data-op-cta]");
-      const inscribible = op.status === "abiertas" || op.status === "ultimas";
+      const inscribible = op.status === "abiertas" || op.status === "ultimas" || admiteListaEspera(op);
       if (inscribible) {
         ctaBtn.href = `inscripcion.html?op=${op.id}`;
-        ctaBtn.textContent = "INICIAR INSCRIPCIÓN";
+        ctaBtn.textContent = admiteListaEspera(op) ? "APUNTARME A LA LISTA DE ESPERA" : "INICIAR INSCRIPCIÓN";
         ctaBtn.classList.add("btn-primary");
         ctaBtn.classList.remove("btn-outline");
         ctaBtn.removeAttribute("aria-disabled");

@@ -7,7 +7,7 @@
 (function () {
   "use strict";
 
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     const wrap = document.querySelector("[data-countdown]");
     const titleEl = document.querySelector("[data-countdown-title]");
     if (!wrap || typeof OPERACIONES === "undefined") return;
@@ -25,6 +25,14 @@
     }
 
     if (titleEl) titleEl.textContent = proxima.nombre;
+    const previsionEl = document.querySelector("[data-prevision-linea]");
+    if (previsionEl && window.TiempoCampo) {
+      window.TiempoCampo.resumen(proxima).then((texto) => {
+        if (!texto) return;
+        previsionEl.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5"/></svg> PREVISIÓN EN EL CAMPO: ${texto}`;
+        previsionEl.hidden = false;
+      });
+    }
 
     // Hora de inicio en hora de España, sea cual sea la zona del visitante.
     const target = fechaHoraMadrid(proxima.fecha, proxima.horaInicio);

@@ -163,12 +163,52 @@ function hoyEnMadrid() {
  * sola al archivo de "Operaciones finalizadas". El día de la partida
  * sigue apareciendo como activa; se cierra a partir del día siguiente.
  * --------------------------------------------------------------- */
-(function cerrarOperacionesPasadas() {
+function cerrarOperacionesPasadas() {
   const hoy = hoyEnMadrid();
   OPERACIONES.forEach((op) => {
     if (op.fecha < hoy && op.status !== "finalizado") op.status = "finalizado";
   });
+}
+cerrarOperacionesPasadas();
+
+/* ---------------------------------------------------------------
+ * PARTIDAS DESDE LA BASE DE DATOS
+ * Las partidas se crean y editan desde la zona del organizador y se
+ * guardan en Supabase. La lista de arriba es solo una copia de respaldo
+ * por si la base de datos no responde: la web la usa mientras tanto.
+ * Todas las páginas esperan a OPERACIONES_LISTO antes de pintar.
+ * --------------------------------------------------------------- */
+const SUPABASE_REST = "https://qugmbyqesdbxpbvytimd.supabase.co/rest/v1";
+const SUPABASE_PUBLICA = "sb_publishable_i-MGthoW18TsiMlsnPr2NQ_7umDZSac";
+
+window.OPERACIONES_LISTO = (function cargarOperaciones() {
+  if (typeof fetch !== "function") return Promise.resolve();
+  const control = typeof AbortController === "function" ? new AbortController() : null;
+  const espera = setTimeout(() => control && control.abort(), 5000);
+  return fetch(`${SUPABASE_REST}/operaciones?select=datos&order=fecha.asc`, {
+    headers: { apikey: SUPABASE_PUBLICA },
+    signal: control ? control.signal : undefined,
+  })
+    .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+    .then((filas) => {
+      if (Array.isArray(filas) && filas.length) {
+        OPERACIONES.length = 0;
+        filas.forEach((f) => OPERACIONES.push(f.datos));
+        cerrarOperacionesPasadas();
+      }
+    })
+    .catch((err) => console.warn("Se usan las partidas guardadas en la web:", err.message || err))
+    .finally(() => clearTimeout(espera));
 })();
+
+// Ejecuta fn cuando la página está lista y las partidas cargadas.
+function cuandoOperaciones(fn) {
+  const dom = new Promise((ok) => {
+    if (document.readyState !== "loading") ok();
+    else document.addEventListener("DOMContentLoaded", ok, { once: true });
+  });
+  Promise.all([dom, window.OPERACIONES_LISTO]).then(() => fn());
+}
 
 // Utilidad compartida: devuelve las operaciones ordenadas por fecha.
 function ordenarOperacionesPorFecha(lista) {

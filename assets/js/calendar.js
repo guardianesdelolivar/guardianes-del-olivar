@@ -18,7 +18,7 @@
     return new URLSearchParams(location.search).get(name);
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     const monthLabel = document.querySelector("[data-cal-month]");
     const grid = document.querySelector("[data-cal-grid]");
     const prevBtn = document.querySelector("[data-cal-prev]");
@@ -106,7 +106,7 @@
         ${availabilityHTML(op)}
         <div style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;">
           <a class="btn btn-outline btn-outline--green" href="operacion.html?op=${op.id}">VER DOSSIER</a>
-          ${inscribible ? `<a class="btn btn-primary" href="inscripcion.html?op=${op.id}">INSCRIBIRME</a>` : `<button class="btn btn-primary" disabled>${op.status === "completo" ? "COMPLETO" : "FINALIZADO"}</button>`}
+          ${inscribible ? `<a class="btn btn-primary" href="inscripcion.html?op=${op.id}">INSCRIBIRME</a>` : admiteListaEspera(op) ? `<a class="btn btn-outline" href="inscripcion.html?op=${op.id}">LISTA DE ESPERA</a>` : `<button class="btn btn-primary" disabled>${op.status === "completo" ? "COMPLETO" : "FINALIZADO"}</button>`}
         </div>`;
     }
 

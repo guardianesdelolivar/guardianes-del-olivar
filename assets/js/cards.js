@@ -50,6 +50,11 @@ function tieneLimitePlazas(op) {
   return typeof op.plazasTotal === "number" && op.plazasTotal > 0;
 }
 
+// Partida llena pero con lista de espera abierta.
+function admiteListaEspera(op) {
+  return op.status === "completo" && tieneLimitePlazas(op);
+}
+
 function porcentajeOcupacion(op) {
   if (!tieneLimitePlazas(op)) return 0;
   return Math.round((op.plazasOcupadas / op.plazasTotal) * 100);
@@ -78,7 +83,7 @@ function availabilityHTML(op) {
     <div class="availability">
       <div class="availability__label">
         <span>${op.plazasOcupadas}/${op.plazasTotal} OPERADORES</span>
-        <span>${pct}%</span>
+        <span>${admiteListaEspera(op) && op.enEspera ? `${op.enEspera} EN ESPERA` : `${pct}%`}</span>
       </div>
       <div class="availability__bar">
         <div class="availability__fill ${claseDisponibilidad(op)}" style="width:${pct}%"></div>
@@ -146,7 +151,9 @@ function opCardHTML(op, opts) {
       <a class="btn btn-outline btn-outline--green" href="operacion.html?op=${op.id}">VER DOSSIER</a>
       ${inscribible
         ? `<a class="btn btn-primary" href="inscripcion.html?op=${op.id}">INSCRIBIRME</a>`
-        : `<button class="btn btn-primary" disabled>${op.status === "completo" ? "COMPLETO" : "FINALIZADO"}</button>`}
+        : admiteListaEspera(op)
+          ? `<a class="btn btn-outline" href="inscripcion.html?op=${op.id}">LISTA DE ESPERA</a>`
+          : `<button class="btn btn-primary" disabled>${op.status === "completo" ? "COMPLETO" : "FINALIZADO"}</button>`}
     </div>
   </article>`;
 }

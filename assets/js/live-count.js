@@ -44,11 +44,20 @@ function contarInscritos(op) {
 }
 window.actualizarRecuentoInscritos = contarInscritos;
 
+function contarEspera(op) {
+  const cliente = window.supabaseClient;
+  if (!cliente || !op.plazasTotal) return Promise.resolve(0);
+  return cliente.rpc("contar_espera", { op: op.id })
+    .then(({ data }) => { op.enEspera = typeof data === "number" ? data : 0; return op.enEspera; })
+    .catch(() => 0);
+}
+window.contarEspera = contarEspera;
+
 const RECUENTO_SUPABASE_LISTO = new Promise((resolve) => {
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     if (typeof OPERACIONES === "undefined") { resolve(); return; }
     const pendientes = OPERACIONES.filter((op) => op.status !== "finalizado" && !op.contadorEnVivo);
-    Promise.all(pendientes.map(contarInscritos)).then(() => resolve());
+    Promise.all(pendientes.map((op) => Promise.all([contarInscritos(op), contarEspera(op)]))).then(() => resolve());
   });
 });
 

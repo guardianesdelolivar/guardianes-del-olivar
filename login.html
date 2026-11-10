@@ -180,6 +180,26 @@
           <h3 style="margin-bottom:6px;">Mis partidas</h3>
           <p style="font-size:13px;margin-bottom:16px;">Las operaciones a las que estás apuntado. Si no puedes venir, date de baja para dejar tu plaza a otro jugador.</p>
           <div class="mis-partidas" data-mis-partidas><p class="form-note">Cargando…</p></div>
+          <div data-mi-espera-bloque hidden style="margin-top:20px;">
+            <h4 class="mi-subtitulo">En lista de espera</h4>
+            <div class="mis-partidas" data-mi-espera></div>
+          </div>
+        </div>
+
+        <div class="form-card" style="margin-top:22px;">
+          <h3 style="margin-bottom:6px;">Avisos de nuevas partidas</h3>
+          <p style="font-size:13px;margin-bottom:16px;">Recibe un email cada vez que publiquemos una operación nueva. Puedes quitarlo cuando quieras.</p>
+          <label class="interruptor">
+            <input type="checkbox" data-avisos-toggle disabled />
+            <span class="interruptor__pista" aria-hidden="true"></span>
+            <span data-avisos-texto>Cargando…</span>
+          </label>
+        </div>
+
+        <div class="form-card" style="margin-top:22px;">
+          <h3 style="margin-bottom:6px;">Mis réplicas</h3>
+          <p style="font-size:13px;margin-bottom:16px;">Las mediciones del cronógrafo que ha anotado la organización.</p>
+          <div class="mis-partidas" data-mis-replicas><p class="form-note">Cargando…</p></div>
         </div>
 
         <div class="form-card organizador-acceso" data-organizador-acceso hidden style="margin-top:22px;">
@@ -237,6 +257,7 @@
 <script src="assets/js/data/operaciones.js?v=20261106b"></script>
 <script src="assets/js/auth.js?v=20261106b"></script>
 <script src="assets/js/main.js?v=20261106b"></script>
+<script src="assets/js/mi-cuenta.js?v=20261107"></script>
 <script src="assets/js/login-page.js?v=20261106b"></script>
 </body>
 </html>

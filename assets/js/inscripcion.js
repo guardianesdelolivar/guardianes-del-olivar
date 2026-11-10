@@ -141,7 +141,7 @@ const EMAILJS_CONFIG = {
     experiencia: "Selecciona tu nivel de experiencia.",
   };
 
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     const id = getParam("op");
     const op = id ? obtenerOperacionPorId(id) : null;
     const summary = document.querySelector("[data-inscripcion-summary]");
@@ -155,7 +155,7 @@ const EMAILJS_CONFIG = {
     // o quiere cambiarla).
     if (opSelect) {
       const inscribibles = ordenarOperacionesPorFecha(
-        OPERACIONES.filter((o) => o.status === "abiertas" || o.status === "ultimas")
+        OPERACIONES.filter((o) => o.status === "abiertas" || o.status === "ultimas" || (o.status === "completo" && o.plazasTotal))
       );
       opSelect.innerHTML = inscribibles
         .map((o) => `<option value="${o.id}">${o.nombre} — ${o.fechaDisplay}</option>`)
@@ -191,13 +191,30 @@ const EMAILJS_CONFIG = {
       return;
     }
 
-    if (op.status !== "abiertas" && op.status !== "ultimas") {
+    // Partida llena con plazas limitadas: se ofrece la lista de espera.
+    const admiteEspera = !!op.plazasTotal;
+    if (op.status !== "abiertas" && op.status !== "ultimas" && !(op.status === "completo" && admiteEspera)) {
       summary.closest(".info-card").innerHTML = `<div class="empty-state">ESTA OPERACIÓN NO ADMITE NUEVAS INSCRIPCIONES (${ESTADO_TEXTO[op.status]}).<br><br><a class="btn btn-outline" href="operaciones.html">VER OTRAS OPERACIONES</a></div>`;
       if (form) form.closest(".form-card").style.display = "none";
       return;
     }
 
     renderSummary(op);
+
+    // ---- Modo lista de espera ----
+    let modoEspera = false;
+    function activarModoEspera() {
+      if (modoEspera || !admiteEspera || !form) return;
+      modoEspera = true;
+      const boton = form.querySelector('button[type="submit"]');
+      if (boton) boton.textContent = "APUNTARME A LA LISTA DE ESPERA";
+      const aviso = document.createElement("div");
+      aviso.className = "auth-gate auth-gate--nota";
+      aviso.innerHTML = `<strong>Esta partida está completa.</strong> Rellena el formulario y te apuntamos a la <strong>lista de espera</strong>: si alguien se da de baja, entras automáticamente y te avisamos por email.`;
+      form.insertAdjacentElement("afterbegin", aviso);
+    }
+    if (op.status === "completo") activarModoEspera();
+    (window.PLAZAS_LISTO || Promise.resolve()).then(() => { if (op.status === "completo") activarModoEspera(); });
     // Cuando llegue el número real de plazas, refrescamos solo el resumen
     // (badge y barra de disponibilidad), sin bloquear la carga del formulario.
     (window.PLAZAS_LISTO || Promise.resolve()).then(() => renderSummary(op));
@@ -277,6 +294,7 @@ const EMAILJS_CONFIG = {
     // confirmada. Si la cuenta ya estaba inscrita, la base de datos lo rechaza.
     function reservarPlaza(payload) {
       if (!usuarioActual || !window.supabaseClient) return Promise.resolve("sin-sesion");
+      const tabla = modoEspera ? "lista_espera" : "inscripciones_registro";
       // Se guarda una copia de los datos de la inscripción: la usa la lista
       // del organizador y el recordatorio automático por email.
       const datos = {
@@ -301,11 +319,13 @@ const EMAILJS_CONFIG = {
         precio: payload.precioFinal,
       };
       return window.supabaseClient
-        .from("inscripciones_registro")
+        .from(tabla)
         .insert({ user_id: usuarioActual.id, operacion_id: op.id, datos })
         .then(({ error }) => {
-          if (!error) return "ok";
-          if (error.code === "23505") return "duplicada";
+          if (!error) return modoEspera ? "espera" : "ok";
+          if (error.code === "23505") return modoEspera ? "ya-en-espera" : "duplicada";
+          if (error.message && error.message.includes("OPERACION_COMPLETA")) return "completa";
+          if (error.message && error.message.includes("YA_INSCRITO")) return "duplicada";
           console.error("No se pudo guardar la inscripción en la base de datos:", error.message);
           return "error";
         });
@@ -452,7 +472,30 @@ const EMAILJS_CONFIG = {
       if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "CONFIRMANDO…"; }
 
       reservarPlaza(payload).then((reserva) => {
-        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "CONFIRMAR INSCRIPCIÓN"; }
+        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = modoEspera ? "APUNTARME A LA LISTA DE ESPERA" : "CONFIRMAR INSCRIPCIÓN"; }
+        if (reserva === "completa") {
+          // Se ha llenado mientras rellenaba el formulario.
+          activarModoEspera();
+          if (errorEnvio) errorEnvio.textContent = "Se acaba de completar la última plaza. Pulsa de nuevo para apuntarte a la lista de espera.";
+          return;
+        }
+        if (reserva === "ya-en-espera") {
+          if (errorEnvio) errorEnvio.textContent = "Ya estás en la lista de espera de esta partida. Puedes verlo en «Mi cuenta».";
+          return;
+        }
+        if (reserva === "espera") {
+          form.style.display = "none";
+          successPanel.classList.add("is-visible");
+          successPanel.querySelector("h3").textContent = "EN LISTA DE ESPERA";
+          const refEl = successPanel.querySelector("[data-ref]");
+          refEl.closest("p").textContent = "Te avisaremos por email si se libera una plaza.";
+          const nota = successPanel.querySelector("[data-email-status]");
+          window.supabaseClient.rpc("mi_posicion_espera", { op: op.id }).then(({ data }) => {
+            if (nota) nota.textContent = data ? `Eres el número ${data} de la lista. Si alguien se da de baja, entras automáticamente.` : "Si alguien se da de baja, entras automáticamente.";
+          });
+          successPanel.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
         if (reserva === "sin-sesion") {
           if (errorEnvio) errorEnvio.textContent = "Tu sesión ha caducado. Vuelve a iniciar sesión para inscribirte.";
           return;

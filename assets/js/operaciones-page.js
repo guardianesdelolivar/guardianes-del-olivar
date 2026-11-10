@@ -11,7 +11,7 @@
 (function () {
   "use strict";
 
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     function pintar() {
       const grid = document.querySelector("[data-ops-grid]");
       const gridPast = document.querySelector("[data-ops-grid-past]");

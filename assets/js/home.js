@@ -10,7 +10,7 @@
 (function () {
   "use strict";
 
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     function pintar() {
       const grid = document.querySelector("[data-home-ops]");
       const futuras = ordenarOperacionesPorFecha(

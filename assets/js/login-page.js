@@ -5,7 +5,7 @@
 (function () {
   "use strict";
 
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     const guestBlock = document.querySelector("[data-auth-guest]");
     const userBlock = document.querySelector("[data-auth-user]");
     const userEmailEl = document.querySelector("[data-user-email]");

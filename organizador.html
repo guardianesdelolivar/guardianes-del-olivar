@@ -47,8 +47,8 @@
   <div class="page-header">
     <div class="container">
       <span class="eyebrow">Zona restringida</span>
-      <h1 style="font-size:clamp(30px,5vw,48px);">INSCRITOS</h1>
-      <p class="lede" style="max-width:620px;margin-top:10px;">Lista privada de jugadores apuntados a cada operación. Solo la ven las cuentas de organización.</p>
+      <h1 style="font-size:clamp(30px,5vw,48px);">ORGANIZADOR</h1>
+      <p class="lede" style="max-width:620px;margin-top:10px;">Inscritos, partidas y cronógrafo. Solo lo ven las cuentas de organización.</p>
     </div>
   </div>
 
@@ -57,32 +57,164 @@
       <div data-org-estado class="empty-state">Comprobando acceso…</div>
 
       <div data-org-panel hidden>
-        <div class="filters org-selector">
-          <div>
-            <label for="org-op">Operación</label>
-            <select id="org-op" data-org-op></select>
+        <div class="org-pestanas" role="tablist">
+          <button type="button" role="tab" class="org-pestana is-activa" data-pestana="inscritos" aria-selected="true">INSCRITOS</button>
+          <button type="button" role="tab" class="org-pestana" data-pestana="partidas" aria-selected="false">PARTIDAS</button>
+          <button type="button" role="tab" class="org-pestana" data-pestana="replicas" aria-selected="false">CRONÓGRAFO</button>
+        </div>
+
+        <!-- ============ INSCRITOS ============ -->
+        <div data-panel="inscritos">
+          <div class="filters org-selector">
+            <div>
+              <label for="org-op">Operación</label>
+              <select id="org-op" data-org-op></select>
+            </div>
+          </div>
+
+          <div class="org-resumen" data-org-resumen></div>
+
+          <div class="org-acciones">
+            <button type="button" class="btn btn-outline" data-org-copiar>COPIAR TELÉFONOS</button>
+            <button type="button" class="btn btn-outline" data-org-csv>DESCARGAR LISTA (CSV)</button>
+            <button type="button" class="btn btn-outline" data-org-imprimir>IMPRIMIR LISTA</button>
+            <span class="form-note" data-org-aviso role="status"></span>
+          </div>
+
+          <div class="org-tabla-wrap">
+            <table class="org-tabla">
+              <thead>
+                <tr>
+                  <th>#</th><th>Callsign</th><th>Nombre</th><th>Teléfono</th><th>Email</th><th>DNI</th>
+                  <th>Experiencia</th><th>Duerme</th><th>Almuerzo</th><th>Fotos</th><th>Observaciones</th><th>Inscrito</th><th></th>
+                </tr>
+              </thead>
+              <tbody data-org-filas></tbody>
+            </table>
+          </div>
+
+          <h3 class="org-subtitulo">Lista de espera</h3>
+          <p class="form-note" style="margin-bottom:12px;">Cuando alguien se da de baja, el primero de esta lista entra solo y recibe un email.</p>
+          <div class="org-tabla-wrap">
+            <table class="org-tabla">
+              <thead><tr><th>#</th><th>Callsign</th><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Apuntado</th><th></th></tr></thead>
+              <tbody data-org-espera></tbody>
+            </table>
           </div>
         </div>
 
-        <div class="org-resumen" data-org-resumen></div>
+        <!-- ============ PARTIDAS ============ -->
+        <div data-panel="partidas" hidden>
+          <div class="org-acciones">
+            <button type="button" class="btn btn-primary" data-partida-nueva>+ NUEVA PARTIDA</button>
+            <span class="form-note" data-partida-aviso role="status"></span>
+          </div>
+          <div class="org-lista-partidas" data-partidas-lista></div>
 
-        <div class="org-acciones">
-          <button type="button" class="btn btn-outline" data-org-copiar>COPIAR TELÉFONOS</button>
-          <button type="button" class="btn btn-outline" data-org-csv>DESCARGAR LISTA (CSV)</button>
-          <button type="button" class="btn btn-outline" data-org-imprimir>IMPRIMIR LISTA</button>
-          <span class="form-note" data-org-aviso role="status"></span>
+          <form class="form-card org-form-partida" data-partida-form hidden novalidate>
+            <h3 data-partida-titulo style="margin-bottom:18px;">Nueva partida</h3>
+            <input type="hidden" name="id" />
+
+            <div class="form-grid cols-2">
+              <div class="field"><label for="pf-nombre">Nombre *</label><input id="pf-nombre" name="nombre" required maxlength="80" placeholder="PARTIDA 24 HORAS · 3ª EDICIÓN" /></div>
+              <div class="field"><label for="pf-tipo">Tipo</label><input id="pf-tipo" name="tipo" maxlength="60" placeholder="Partida especial" /></div>
+              <div class="field"><label for="pf-fecha">Fecha *</label><input id="pf-fecha" name="fecha" type="date" required /></div>
+              <div class="field"><label for="pf-hora">Hora de inicio *</label><input id="pf-hora" name="horaInicio" type="time" required value="08:00" /></div>
+              <div class="field"><label for="pf-duracion">Duración (horas)</label><input id="pf-duracion" name="duracionHoras" type="number" min="1" max="72" step="1" value="8" /></div>
+              <div class="field"><label for="pf-precio">Precio (€) *</label><input id="pf-precio" name="precio" type="number" min="0" step="1" required value="10" /></div>
+              <div class="field"><label for="pf-plazas">Plazas (vacío = sin límite)</label><input id="pf-plazas" name="plazasTotal" type="number" min="1" step="1" /></div>
+              <div class="field"><label for="pf-estado">Estado</label>
+                <select id="pf-estado" name="status">
+                  <option value="abiertas">Inscripciones abiertas</option>
+                  <option value="ultimas">Últimas plazas</option>
+                  <option value="completo">Completo</option>
+                  <option value="finalizado">Finalizada</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field" style="margin-top:18px;"><label for="pf-horario">Horario (texto)</label><input id="pf-horario" name="horario" maxlength="200" placeholder="Encuentro 08:00 h · Cronografiado 08:30 · Partida hasta las 14:00" /></div>
+            <div class="form-grid cols-2" style="margin-top:18px;">
+              <div class="field"><label for="pf-encuentro">Punto de encuentro</label><input id="pf-encuentro" name="puntoEncuentro" maxlength="120" value="En el propio campo de Guardianes del Olivar" /></div>
+              <div class="field"><label for="pf-mapa-enc">Enlace de Maps del encuentro</label><input id="pf-mapa-enc" name="mapaPuntoEncuentro" type="url" maxlength="200" value="https://maps.app.goo.gl/tWSZByowQHgVgcqg8" /></div>
+              <div class="field"><label for="pf-dificultad">Nivel</label><input id="pf-dificultad" name="dificultad" maxlength="40" value="Todos los niveles" /></div>
+              <div class="field"><label for="pf-facciones">Facciones (separadas por comas)</label><input id="pf-facciones" name="facciones" maxlength="120" placeholder="Escuadrón Cuervo, Escuadrón Lobo" /></div>
+            </div>
+
+            <div class="field" style="margin-top:18px;"><label for="pf-resumen">Resumen (una o dos frases) *</label><textarea id="pf-resumen" name="resumen" rows="2" maxlength="300" required></textarea></div>
+            <div class="field" style="margin-top:18px;"><label for="pf-historia">Historia de la operación</label><textarea id="pf-historia" name="historia" rows="3" maxlength="1500"></textarea></div>
+            <div class="field" style="margin-top:18px;"><label for="pf-briefing">Briefing</label><textarea id="pf-briefing" name="briefing" rows="4" maxlength="2500"></textarea></div>
+
+            <div class="form-grid cols-2" style="margin-top:18px;">
+              <div class="field"><label for="pf-objetivos">Objetivos (uno por línea)</label><textarea id="pf-objetivos" name="objetivos" rows="4" placeholder="Captura la bandera&#10;Desactiva la bomba"></textarea></div>
+              <div class="field"><label for="pf-misiones">Misiones (una por línea: Título: detalle)</label><textarea id="pf-misiones" name="misiones" rows="4" placeholder="Punto de encuentro: 08:00 h en el campo&#10;Cronografiado: de 08:30 a 09:00"></textarea></div>
+              <div class="field"><label for="pf-llevar">Qué llevar (uno por línea)</label><textarea id="pf-llevar" name="queLlevar" rows="4">Réplica revisada
+Protección ocular homologada (obligatoria)
+Agua y comida
+Calzado adecuado para terreno natural</textarea></div>
+              <div class="field"><label for="pf-reglas">Reglas especiales (una por línea)</label><textarea id="pf-reglas" name="reglasEspeciales" rows="4"></textarea></div>
+            </div>
+
+            <div class="org-checks">
+              <label class="field-check"><input type="checkbox" name="almuerzo" checked /> Ofrecer almuerzo (+10 €) al inscribirse</label>
+              <label class="field-check"><input type="checkbox" name="pernocta" /> Preguntar si se quedan a dormir en el campo</label>
+              <label class="field-check"><input type="checkbox" name="publicada" checked /> Publicada (visible en la web)</label>
+            </div>
+
+            <div class="field" style="margin-top:18px;">
+              <label for="pf-cartel">Cartel (imagen)</label>
+              <input id="pf-cartel" name="cartel" type="file" accept="image/*" />
+              <img data-cartel-vista alt="" style="max-width:200px;margin-top:10px;display:none;border:var(--border-hairline);" />
+            </div>
+
+            <details class="op-card__expand" style="margin-top:22px;">
+              <summary>CRÓNICA (después de jugar)</summary>
+              <div class="field" style="margin-top:14px;"><label for="pf-cronica">Cómo fue la partida</label><textarea id="pf-cronica" name="cronica" rows="5" maxlength="4000" placeholder="Qué pasó, momentos destacados, agradecimientos…"></textarea></div>
+              <div class="field" style="margin-top:14px;"><label for="pf-resultados">Resultados (uno por línea: Misión: ganador)</label><textarea id="pf-resultados" name="resultados" rows="3" placeholder="Captura la bandera: Escuadrón Lobo"></textarea></div>
+            </details>
+
+            <p class="form-error" data-partida-error role="alert"></p>
+            <div class="form-footer" style="flex-direction:row;flex-wrap:wrap;">
+              <button type="submit" class="btn btn-primary btn-lg">GUARDAR PARTIDA</button>
+              <button type="button" class="btn btn-outline btn-lg" data-partida-cancelar>CANCELAR</button>
+              <button type="button" class="btn btn-outline btn-lg btn-baja" data-partida-borrar hidden>BORRAR PARTIDA</button>
+            </div>
+            <p class="form-note">Al publicar una partida nueva, se avisa por email a los jugadores que tienen activados los avisos.</p>
+          </form>
         </div>
 
-        <div class="org-tabla-wrap">
-          <table class="org-tabla">
-            <thead>
-              <tr>
-                <th>#</th><th>Callsign</th><th>Nombre</th><th>Teléfono</th><th>Email</th><th>DNI</th>
-                <th>Experiencia</th><th>Duerme</th><th>Almuerzo</th><th>Fotos</th><th>Observaciones</th><th>Inscrito</th><th></th>
-              </tr>
-            </thead>
-            <tbody data-org-filas></tbody>
-          </table>
+        <!-- ============ CRONÓGRAFO ============ -->
+        <div data-panel="replicas" hidden>
+          <form class="form-card" data-replica-form novalidate>
+            <h3 style="margin-bottom:16px;">Anotar réplica</h3>
+            <div class="form-grid cols-2">
+              <div class="field"><label for="rf-jugador">Jugador *</label><select id="rf-jugador" name="user_id" required></select></div>
+              <div class="field"><label for="rf-nombre">Réplica (marca / modelo) *</label><input id="rf-nombre" name="nombre" maxlength="80" required placeholder="Specna Arms SA-E05" /></div>
+              <div class="field"><label for="rf-tipo">Tipo *</label>
+                <select id="rf-tipo" name="tipo">
+                  <option value="pistola">Pistola (máx. 320 fps)</option>
+                  <option value="asalto" selected>Asalto (máx. 350 fps)</option>
+                  <option value="apoyo">Apoyo (máx. 400 fps)</option>
+                  <option value="dmr">DMR (máx. 450 fps)</option>
+                  <option value="sniper">Sniper (máx. 550 fps)</option>
+                </select>
+              </div>
+              <div class="field"><label for="rf-fps">FPS medidos *</label><input id="rf-fps" name="fps" type="number" min="1" max="999" step="0.1" required /></div>
+              <div class="field"><label for="rf-bb">Peso de la BB (g)</label><input id="rf-bb" name="peso_bb" type="number" min="0.1" max="0.5" step="0.01" value="0.20" /></div>
+              <div class="field"><label for="rf-notas">Notas</label><input id="rf-notas" name="notas" maxlength="300" placeholder="Hop-up ajustado, etc." /></div>
+            </div>
+            <p class="form-note" data-replica-calculo style="margin-top:12px;"></p>
+            <p class="form-error" data-replica-error role="alert"></p>
+            <div class="form-footer"><button type="submit" class="btn btn-primary">GUARDAR MEDICIÓN</button></div>
+          </form>
+
+          <h3 class="org-subtitulo">Réplicas medidas</h3>
+          <div class="org-tabla-wrap">
+            <table class="org-tabla">
+              <thead><tr><th>Jugador</th><th>Réplica</th><th>Tipo</th><th>FPS</th><th>BB</th><th>Julios</th><th>Normas</th><th>Fecha</th><th></th></tr></thead>
+              <tbody data-replicas-filas></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -134,6 +266,7 @@
 <script src="assets/vendor/supabase-2.118.0.js?v=20261106b"></script>
 <script src="assets/js/auth.js?v=20261106b"></script>
 <script src="assets/js/main.js?v=20261106b"></script>
+<script src="assets/js/organizador-gestion.js?v=20261107"></script>
 <script src="assets/js/organizador.js?v=20261106b"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@
 
   const EXPERIENCIA = { ninguna: "Sin experiencia", iniciado: "< 1 año", intermedio: "1-3 años", avanzado: "> 3 años" };
 
-  document.addEventListener("DOMContentLoaded", () => {
+  cuandoOperaciones(() => {
     const estado = document.querySelector("[data-org-estado]");
     const panel = document.querySelector("[data-org-panel]");
     const selector = document.querySelector("[data-org-op]");
@@ -47,9 +47,56 @@
         }
         estado.remove();
         panel.hidden = false;
+        prepararPestanas();
         prepararSelector();
+        // Avisa a la parte de gestión (partidas y cronógrafo) de que hay acceso.
+        document.dispatchEvent(new CustomEvent("org:acceso", { detail: { user } }));
       });
     });
+
+    function prepararPestanas() {
+      const pestanas = document.querySelectorAll("[data-pestana]");
+      pestanas.forEach((b) => b.addEventListener("click", () => {
+        pestanas.forEach((x) => { const activa = x === b; x.classList.toggle("is-activa", activa); x.setAttribute("aria-selected", String(activa)); });
+        document.querySelectorAll("[data-panel]").forEach((p) => { p.hidden = p.getAttribute("data-panel") !== b.getAttribute("data-pestana"); });
+      }));
+    }
+
+    const esperaEl = document.querySelector("[data-org-espera]");
+    function cargarEspera(op, porId) {
+      if (!esperaEl) return;
+      cliente.from("lista_espera").select("id, user_id, created_at, datos").eq("operacion_id", op.id).order("created_at", { ascending: true })
+        .then(({ data, error }) => {
+          if (error || !data || !data.length) { esperaEl.innerHTML = `<tr><td colspan="7" class="num">Nadie en lista de espera.</td></tr>`; return; }
+          const faltan = data.map((e) => e.user_id).filter((id) => !porId[id]);
+          const extra = faltan.length ? cliente.from("profiles").select("*").in("id", faltan).then(({ data: d }) => d || []) : Promise.resolve([]);
+          extra.then((lista) => {
+            lista.forEach((p) => { porId[p.id] = p; });
+            esperaEl.innerHTML = data.map((e, n) => {
+              const p = porId[e.user_id] || {}; const d = e.datos || {};
+              const tel = d.telefono || p.telefono || "";
+              return `<tr>
+                <td class="num">${n + 1}</td>
+                <td><strong>${escapar(d.callsign || p.callsign || p.username || "—")}</strong></td>
+                <td>${escapar([d.nombre || p.nombre, d.apellidos || p.apellidos].filter(Boolean).join(" ") || "—")}</td>
+                <td>${tel ? `<a href="https://wa.me/34${escapar(tel.replace(/\D/g, "").replace(/^34(?=\d{9}$)/, ""))}" target="_blank" rel="noopener">${escapar(tel)}</a>` : "—"}</td>
+                <td>${escapar(d.email) || "—"}</td>
+                <td><small>${new Date(e.created_at).toLocaleString("es-ES", { timeZone: "Europe/Madrid", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</small></td>
+                <td><button type="button" class="btn btn-outline btn-baja" data-quitar-espera="${e.id}" style="padding:6px 10px;font-size:10px;">QUITAR</button></td>
+              </tr>`;
+            }).join("");
+          });
+        });
+    }
+    if (esperaEl) {
+      esperaEl.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-quitar-espera]");
+        if (!btn) return;
+        if (!btn.classList.contains("is-confirmando")) { btn.classList.add("is-confirmando"); btn.textContent = "¿SEGURO?"; return; }
+        btn.disabled = true;
+        cliente.from("lista_espera").delete().eq("id", btn.getAttribute("data-quitar-espera")).then(() => cargar());
+      });
+    }
 
     function prepararSelector() {
       const ordenadas = ordenarOperacionesPorFecha(OPERACIONES);
@@ -78,6 +125,7 @@
             : Promise.resolve([]);
           perfiles.then((lista) => {
             const porId = Object.fromEntries(lista.map((p) => [p.id, p]));
+            cargarEspera(op, porId);
             filasActuales = (inscripciones || []).map((i) => {
               const p = porId[i.user_id] || {};
               const d = i.datos || {};
