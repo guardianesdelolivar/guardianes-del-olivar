@@ -222,6 +222,52 @@
       window.obtenerUsuarioActual().then(mostrarEstado);
     }
 
+    // --- ¿Has olvidado tu contraseña? ---
+    const olvidoForm = document.querySelector("[data-olvido-form]");
+    const olvidoMsg = document.querySelector("[data-olvido-msg]");
+    const olvidoAbrir = document.querySelector("[data-olvido-abrir]");
+    const olvidoVolver = document.querySelector("[data-olvido-volver]");
+    if (olvidoForm && olvidoAbrir) {
+      [tabLogin, tabRegistro].forEach((tab) => tab && tab.addEventListener("click", () => { olvidoForm.style.display = "none"; }));
+      olvidoAbrir.addEventListener("click", (e) => {
+        e.preventDefault();
+        loginForm.style.display = "none";
+        olvidoForm.style.display = "block";
+        if (loginForm.email.value) olvidoForm.email.value = loginForm.email.value;
+        olvidoForm.email.focus();
+      });
+      olvidoVolver.addEventListener("click", (e) => {
+        e.preventDefault();
+        olvidoForm.style.display = "none";
+        loginForm.style.display = "block";
+      });
+      olvidoForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = olvidoForm.email.value.trim();
+        const campo = olvidoForm.email.closest(".field");
+        const valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (campo) campo.classList.toggle("has-error", !valido);
+        if (!valido) return;
+        const btn = olvidoForm.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        olvidoMsg.style.color = "";
+        olvidoMsg.textContent = "Enviando…";
+        window.supabaseClient.auth
+          .resetPasswordForEmail(email, { redirectTo: `${location.origin}/restablecer.html` })
+          .then(({ error }) => {
+            btn.disabled = false;
+            if (error && /rate|seconds|too many/i.test(error.message || "")) {
+              olvidoMsg.style.color = "var(--c-red-bright)";
+              olvidoMsg.textContent = "Has pedido varios enlaces seguidos. Espera unos minutos y vuelve a intentarlo.";
+              return;
+            }
+            // No se dice si la cuenta existe o no (así nadie puede averiguar qué emails están registrados).
+            olvidoMsg.style.color = "var(--c-green-bright)";
+            olvidoMsg.textContent = "Si hay una cuenta con ese email, te acabamos de enviar un enlace. Revisa también la carpeta de spam. Si en 10 minutos no te ha llegado, avisa a la organización por WhatsApp.";
+          });
+      });
+    }
+
     if (loginForm) {
       loginForm.addEventListener("submit", (e) => {
         e.preventDefault();

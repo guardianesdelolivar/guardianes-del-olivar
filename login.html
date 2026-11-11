@@ -11,7 +11,7 @@
 <link rel="icon" href="assets/logo-180.png" type="image/png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/css/styles.css?v=20261110" />
+<link rel="stylesheet" href="assets/css/styles.css?v=20261111" />
 <noscript><style>.reveal{opacity:1!important;transform:none!important;}</style></noscript>
 </head>
 <body>
@@ -80,6 +80,21 @@
             <div class="form-footer">
               <button type="submit" class="btn btn-primary btn-lg btn-block">ENTRAR</button>
             </div>
+            <p style="text-align:center;margin-top:16px;font-size:13px;"><a href="#" data-olvido-abrir style="color:var(--c-green-bright);">¿Has olvidado tu contraseña?</a></p>
+          </form>
+
+          <form data-olvido-form novalidate style="display:none;">
+            <p style="font-size:14px;margin-bottom:16px;">Escribe el email de tu cuenta y te enviaremos un enlace para crear una contraseña nueva.</p>
+            <div class="field">
+              <label for="olvido-email">Email *</label>
+              <input type="email" id="olvido-email" name="email" autocomplete="email" inputmode="email" required />
+              <span class="field__error">Introduce un email válido.</span>
+            </div>
+            <p data-olvido-msg style="font-size:13px;margin-top:14px;min-height:18px;"></p>
+            <div class="form-footer">
+              <button type="submit" class="btn btn-primary btn-lg btn-block">ENVIAR ENLACE</button>
+            </div>
+            <p style="text-align:center;margin-top:16px;font-size:13px;"><a href="#" data-olvido-volver style="color:var(--c-green-bright);">Volver a iniciar sesión</a></p>
           </form>
 
           <form data-registro-form novalidate style="display:none;">
@@ -233,10 +248,10 @@
   </div>
 </footer>
 
-<script src="assets/vendor/supabase-2.118.0.js?v=20261110"></script>
-<script src="assets/js/data/operaciones.js?v=20261110"></script>
-<script src="assets/js/auth.js?v=20261110"></script>
-<script src="assets/js/main.js?v=20261110"></script>
-<script src="assets/js/login-page.js?v=20261110"></script>
+<script src="assets/vendor/supabase-2.118.0.js?v=20261111"></script>
+<script src="assets/js/data/operaciones.js?v=20261111"></script>
+<script src="assets/js/auth.js?v=20261111"></script>
+<script src="assets/js/main.js?v=20261111"></script>
+<script src="assets/js/login-page.js?v=20261111"></script>
 </body>
 </html>

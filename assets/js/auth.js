@@ -15,6 +15,16 @@ const supabaseClient = window.supabase
   : null;
 window.supabaseClient = supabaseClient;
 
+// Enlace de "he olvidado mi contraseña": aterrice donde aterrice, se lleva a
+// la persona a la página para escribir la contraseña nueva.
+if (supabaseClient) {
+  supabaseClient.auth.onAuthStateChange((evento) => {
+    if (evento === "PASSWORD_RECOVERY" && !/restablecer\.html$/.test(location.pathname)) {
+      location.replace("restablecer.html");
+    }
+  });
+}
+
 function registrarUsuario(email, password, username) {
   if (!supabaseClient) return Promise.resolve({ ok: false, error: "Supabase no disponible." });
   return supabaseClient.auth
