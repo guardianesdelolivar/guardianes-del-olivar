@@ -263,7 +263,7 @@
             }
             // No se dice si la cuenta existe o no (así nadie puede averiguar qué emails están registrados).
             olvidoMsg.style.color = "var(--c-green-bright)";
-            olvidoMsg.textContent = "Si hay una cuenta con ese email, te acabamos de enviar un enlace. Revisa también la carpeta de spam. Si en 10 minutos no te ha llegado, avisa a la organización por WhatsApp.";
+            olvidoMsg.textContent = "Si hay una cuenta con ese email, te acabamos de enviar un enlace (revisa también spam). Si no te llega en unos minutos, es que con ese email no hay ninguna cuenta: prueba con otro email o créala en «Registrarme».";
           });
       });
     }
